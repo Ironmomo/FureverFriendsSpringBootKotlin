@@ -20,7 +20,7 @@ class NGramSearchHandler(
            do {
                var currentIndex = 0
                val page = PageRequest.of(currentIndex, pageSize)
-               val pageable = userRepository.findByUsernameContaining(subString, page)
+               val pageable = userRepository.findByUsernameContainingIgnoreCase(subString, page)
                pageable.content.map(User::username).forEach { username ->
                    val appearance = matchingUsersMap.getOrDefault(username, 0) + 1
                    matchingUsersMap.put(username, appearance)

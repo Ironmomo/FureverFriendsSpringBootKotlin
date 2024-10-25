@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository
 interface UserRepository: JpaRepository<User, Long> {
     fun findUserByUsername(name: String): User?
 
-    fun findByUsernameContaining(name: String, pageable: Pageable): Page<User>
+    fun findByUsernameContainingIgnoreCase(name: String, pageable: Pageable): Page<User>
 
     fun findAllByUsernameIn(usernames: List<String>): Set<User>
 }

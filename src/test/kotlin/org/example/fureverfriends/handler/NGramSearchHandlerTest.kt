@@ -23,8 +23,8 @@ class NGramSearchHandlerTest {
         val user6 = stubUser(6)
         val searchPattern = "name 1"
         val userRepository: UserRepository = mock {
-            on { findByUsernameContaining("nam", PageRequest.of(0, 100)) } doReturn PageImpl(listOf(user1, user2, user3, user4, user5, user6))
-            on { findByUsernameContaining("e 1", PageRequest.of(0, 100)) } doReturn PageImpl(listOf(user1, user2, user3, user4, user5))
+            on { findByUsernameContainingIgnoreCase("nam", PageRequest.of(0, 100)) } doReturn PageImpl(listOf(user1, user2, user3, user4, user5, user6))
+            on { findByUsernameContainingIgnoreCase("e 1", PageRequest.of(0, 100)) } doReturn PageImpl(listOf(user1, user2, user3, user4, user5))
             on { findAllByUsernameIn(listOf(user1.username, user2.username, user3.username, user4.username, user5.username))} doReturn setOf(user1, user2, user3, user4, user5)
         }
         val handler = createHandler(userRepository)
@@ -32,8 +32,8 @@ class NGramSearchHandlerTest {
         val foundUser = handler.nGramSearch(searchPattern)
 
         assertAll(
-            { verify(userRepository).findByUsernameContaining("nam", PageRequest.of(0, 100)) },
-            { verify(userRepository).findByUsernameContaining("e 1", PageRequest.of(0, 100)) },
+            { verify(userRepository).findByUsernameContainingIgnoreCase("nam", PageRequest.of(0, 100)) },
+            { verify(userRepository).findByUsernameContainingIgnoreCase("e 1", PageRequest.of(0, 100)) },
             { verify(userRepository).findAllByUsernameIn(listOf(user1.username, user2.username, user3.username, user4.username, user5.username)) },
             { assertThat(foundUser).isEqualTo(setOf(user1, user2, user3, user4, user5)) }
         )

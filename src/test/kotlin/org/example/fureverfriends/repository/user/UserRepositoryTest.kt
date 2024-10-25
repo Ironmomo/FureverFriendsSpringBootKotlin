@@ -95,19 +95,23 @@ class UserRepositoryTest @Autowired constructor(
             val user4 = User(
                 username = "ccc", password = "somePassword"
             )
+            val user5 = User(
+                username = "Aacc", password = "somePassword"
+            )
             entityManager.persist(user1)
             entityManager.persist(user2)
             entityManager.persist(user3)
             entityManager.persist(user4)
+            entityManager.persist(user5)
             entityManager.flush()
             entityManager.clear()
             val page = PageRequest.of(0, 10)
 
-            val pageable = userRepository.findByUsernameContaining("aa", page)
+            val pageable = userRepository.findByUsernameContainingIgnoreCase("aa", page)
 
             assertAll(
-                { assertThat(pageable.totalElements).isEqualTo(2) },
-                { assertThat(pageable.content).isEqualTo(listOf(user1, user3)) }
+                { assertThat(pageable.totalElements).isEqualTo(3) },
+                { assertThat(pageable.content).isEqualTo(listOf(user1, user3, user5)) }
             )
         }
 
@@ -134,7 +138,7 @@ class UserRepositoryTest @Autowired constructor(
             entityManager.clear()
             val page = PageRequest.of(0, 10)
 
-            val pageable = userRepository.findByUsernameContaining("dd", page)
+            val pageable = userRepository.findByUsernameContainingIgnoreCase("dd", page)
 
             assertThat(pageable.totalElements).isEqualTo(0)
         }
