@@ -1,4 +1,4 @@
-package org.example.fureverfriends.handler
+package org.example.fureverfriends.processor
 
 import org.assertj.core.api.Assertions.assertThat
 import org.example.fureverfriends.repository.user.UserRepository
@@ -11,7 +11,7 @@ import org.mockito.kotlin.verify
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 
-class NGramSearchHandlerTest {
+class NGramSearchProcessorTest {
 
     @Test
     fun `should call service and return a list of users`() {
@@ -27,7 +27,7 @@ class NGramSearchHandlerTest {
             on { findByUsernameContainingIgnoreCase("e 1", PageRequest.of(0, 100)) } doReturn PageImpl(listOf(user1, user2, user3, user4, user5))
             on { findAllByUsernameIn(listOf(user1.username, user2.username, user3.username, user4.username, user5.username))} doReturn setOf(user1, user2, user3, user4, user5)
         }
-        val handler = createHandler(userRepository)
+        val handler = createProcessor(userRepository)
 
         val foundUser = handler.nGramSearch(searchPattern)
 
@@ -42,16 +42,16 @@ class NGramSearchHandlerTest {
     @Test
     fun `on searchString length less then 3 should return empty list`() {
         val searchString = "so"
-        val handler = createHandler()
+        val handler = createProcessor()
 
         val foundUsers = handler.nGramSearch(searchString)
 
         assertThat(foundUsers).isEmpty()
     }
 
-    private fun createHandler(
+    private fun createProcessor(
         userRepository: UserRepository = mock(),
-    ) = NGramSearchHandler(
+    ) = NGramSearchProcessor(
         userRepository = userRepository
     )
 }

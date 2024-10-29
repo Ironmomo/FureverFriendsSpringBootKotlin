@@ -1,4 +1,4 @@
-package org.example.fureverfriends.handler
+package org.example.fureverfriends.processor
 
 import org.example.fureverfriends.model.user.User
 import org.example.fureverfriends.repository.user.UserRepository
@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Component
 
 @Component
-class NGramSearchHandler(
+class NGramSearchProcessor(
     private val userRepository: UserRepository
 ) {
 

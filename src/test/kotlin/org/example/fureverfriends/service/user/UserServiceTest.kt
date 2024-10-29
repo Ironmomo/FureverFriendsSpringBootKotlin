@@ -5,9 +5,9 @@ import org.assertj.core.api.Assertions.catchThrowable
 import org.example.fureverfriends.dto.user.CreateUserRequestDTO
 import org.example.fureverfriends.dto.user.FoundUsersDTO
 import org.example.fureverfriends.dto.user.UserDTO
-import org.example.fureverfriends.handler.NGramSearchHandler
 import org.example.fureverfriends.model.user.Role.USER
 import org.example.fureverfriends.model.user.User
+import org.example.fureverfriends.processor.NGramSearchProcessor
 import org.example.fureverfriends.repository.user.UserRepository
 import org.example.fureverfriends.stubs.stubUser
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -130,15 +130,15 @@ class UserServiceTest {
             val searchString = "famousGuy"
             val user1 = stubUser(1)
             val user2 = stubUser(2)
-            val nGramSearchHandler: NGramSearchHandler = mock {
+            val nGramSearchProcessor: NGramSearchProcessor = mock {
                 on { nGramSearch(searchString) } doReturn setOf(user1, user2)
             }
-            val userService = createUserService(nGramSearchHandler = nGramSearchHandler)
+            val userService = createUserService(nGramSearchProcessor = nGramSearchProcessor)
 
             val foundUsersDTO = userService.searchForUser(searchString)
 
             assertAll(
-                { verify(nGramSearchHandler).nGramSearch(searchString) },
+                { verify(nGramSearchProcessor).nGramSearch(searchString) },
                 { assertThat(foundUsersDTO).isEqualTo(FoundUsersDTO(
                     foundUsers = listOf(
                         UserDTO(user1.username),
@@ -152,11 +152,11 @@ class UserServiceTest {
     private fun createUserService(
         userRepository: UserRepository = mock(),
         encoder: PasswordEncoder = mock(),
-        nGramSearchHandler: NGramSearchHandler = mock()
+        nGramSearchProcessor: NGramSearchProcessor = mock()
     ) =
         UserService(
             userRepository = userRepository,
             encoder = encoder,
-            nGramSearchHandler = nGramSearchHandler,
+            nGramSearchProcessor = nGramSearchProcessor,
         )
 }
