@@ -5,6 +5,7 @@ import org.example.fureverfriends.config.post.PaginationProperties
 import org.example.fureverfriends.dto.post.LatestPostsDTO
 import org.example.fureverfriends.dto.post.PostResponseDTO
 import org.example.fureverfriends.model.post.Post
+import org.example.fureverfriends.model.userfollowing.UserRelationStatus.ACCEPTED
 import org.example.fureverfriends.repository.post.PostRepository
 import org.example.fureverfriends.stubs.stubPost
 import org.junit.jupiter.api.Nested
@@ -21,6 +22,7 @@ class PostServiceTest {
     inner class GetLatestPostsTests {
         @Test
         fun `test pagination page size with remaining posts`() {
+            val currentUser = "someUser"
             val pageSizeValue = 4
             val pageIndexValue = 0
             val posts = listOf(stubPost(1), stubPost(2), stubPost(3), stubPost(4), stubPost(5))
@@ -29,12 +31,12 @@ class PostServiceTest {
             val pagedPosts = PageImpl(posts, pageRequest, posts.size.toLong())
             val postService = createPostService(
                 postRepository = mock {
-                    on { findAll(pageRequest) } doReturn pagedPosts
+                    on { findPostsByFollowedUsers(currentUser, ACCEPTED, pageRequest) } doReturn pagedPosts
                 },
                 paginationProperties = mock { on { pageSize } doReturn pageSizeValue }
             )
 
-            val latestPosts = postService.findLatestPosts(pageIndexValue)
+            val latestPosts = postService.findLatestPosts(currentUser, pageIndexValue)
 
             assertThat(latestPosts).isEqualTo(
                 LatestPostsDTO(
@@ -46,6 +48,7 @@ class PostServiceTest {
 
         @Test
         fun `test pagination page size without remaining posts`() {
+            val currentUser = "someUser"
             val pageSizeValue = 4
             val pageIndexValue = 0
             val posts = listOf(stubPost(1), stubPost(2), stubPost(3), stubPost(4))
@@ -54,12 +57,12 @@ class PostServiceTest {
             val pagedPosts = PageImpl(posts, pageRequest, posts.size.toLong())
             val postService = createPostService(
                 postRepository = mock {
-                    on { findAll(pageRequest) } doReturn pagedPosts
+                    on { findPostsByFollowedUsers(currentUser, ACCEPTED, pageRequest) } doReturn pagedPosts
                 },
                 paginationProperties = mock { on { pageSize } doReturn pageSizeValue }
             )
 
-            val latestPosts = postService.findLatestPosts(pageIndexValue)
+            val latestPosts = postService.findLatestPosts(currentUser, pageIndexValue)
 
             assertThat(latestPosts).isEqualTo(
                 LatestPostsDTO(
@@ -71,6 +74,7 @@ class PostServiceTest {
 
         @Test
         fun `test pagination with empty list`() {
+            val currentUser = "someUser"
             val pageSizeValue = 4
             val pageIndexValue = 2
             val posts = emptyList<Post>()
@@ -79,12 +83,12 @@ class PostServiceTest {
             val pagedPosts = PageImpl(posts, pageRequest, 0)
             val postService = createPostService(
                 postRepository = mock {
-                    on { findAll(pageRequest) } doReturn pagedPosts
+                    on { findPostsByFollowedUsers(currentUser, ACCEPTED, pageRequest) } doReturn pagedPosts
                 },
                 paginationProperties = mock { on { pageSize } doReturn pageSizeValue }
             )
 
-            val latestPosts = postService.findLatestPosts(pageIndexValue)
+            val latestPosts = postService.findLatestPosts(currentUser, pageIndexValue)
 
             assertThat(latestPosts).isEqualTo(
                 LatestPostsDTO(

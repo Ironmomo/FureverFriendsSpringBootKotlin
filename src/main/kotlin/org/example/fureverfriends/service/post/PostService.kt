@@ -2,6 +2,7 @@ package org.example.fureverfriends.service.post
 
 import org.example.fureverfriends.config.post.PaginationProperties
 import org.example.fureverfriends.dto.post.LatestPostsDTO
+import org.example.fureverfriends.model.userfollowing.UserRelationStatus.ACCEPTED
 import org.example.fureverfriends.repository.post.PostRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -14,9 +15,9 @@ class PostService(
 ) {
     private val pageSize = paginationProperties.pageSize
 
-    fun findLatestPosts(index: Int): LatestPostsDTO {
+    fun findLatestPosts(currentUsername: String, index: Int): LatestPostsDTO {
         val pageable = PageRequest.of(index, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"))
-        val postsPage = postRepository.findAll(pageable)
+        val postsPage = postRepository.findPostsByFollowedUsers(currentUsername, ACCEPTED, pageable)
         return LatestPostsDTO(
             posts = postsPage.content.map { it.mapToDTO() },
             isLastPage = postsPage.isLast
