@@ -50,7 +50,7 @@ class ModelTest {
         @Test
         fun `should map User to DTO`() {
             val user = User(
-                id = 0, username = "fancy user", password = "secret Password", role = ADMIN
+                username = "fancy user", password = "secret Password", role = ADMIN
             )
 
             val mapedUserDTO = user.mapToDTO()

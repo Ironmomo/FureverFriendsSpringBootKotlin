@@ -14,7 +14,6 @@ import java.time.temporal.ChronoUnit
 import org.springframework.security.core.userdetails.User as UserDetailsImpl
 
 fun stubUser(id: Int = 1): User = User(
-    id = id.toLong(),
     username = "username $id",
     password = "password $id",
     role = USER

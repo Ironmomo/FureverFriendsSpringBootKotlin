@@ -4,8 +4,6 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType.IDENTITY
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.example.fureverfriends.dto.user.UserDTO
@@ -14,9 +12,6 @@ import org.example.fureverfriends.dto.user.UserDTO
 @Table(name = "users")
 data class User(
     @Id
-    @GeneratedValue(strategy = IDENTITY)
-    val id: Long = 0,
-
     @Column(nullable = false, unique = true)
     val username: String,
 
