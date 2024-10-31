@@ -37,6 +37,40 @@ class UserFollowingRepositoryTest @Autowired constructor(
 
 
     @Nested
+    open inner class FindindUserFollowingByIdFollowerAndIdFollowingAndStatusTests {
+
+        @Test
+        @Transactional
+        open fun `should return UserFollowing existing`() {
+            val userFollowing = userFollowingRepository.findUserFollowingByIdFollowerAndIdFollowingAndStatus(
+                followerId = user1.username, followingId = user2.username, status = ACCEPTED
+            )
+
+            assertThat(userFollowing).isNotNull
+        }
+
+        @Test
+        @Transactional
+        open fun `should return null on UserFollowing pending`() {
+            val userFollowing = userFollowingRepository.findUserFollowingByIdFollowerAndIdFollowingAndStatus(
+                followerId = user1.username, followingId = user3.username, status = ACCEPTED
+            )
+
+            assertThat(userFollowing).isNull()
+        }
+
+        @Test
+        @Transactional
+        open fun `should return null on UserFollowing not existing`() {
+            val userFollowing = userFollowingRepository.findUserFollowingByIdFollowerAndIdFollowingAndStatus(
+                followerId = user3.username, followingId = user1.username, status = ACCEPTED
+            )
+
+            assertThat(userFollowing).isNull()
+        }
+    }
+
+    @Nested
     open inner class FindUserFollowingsByFollowerIdTests {
 
         @Test
@@ -48,7 +82,6 @@ class UserFollowingRepositoryTest @Autowired constructor(
 
             assertThat(hibernateStatistics.prepareStatementCount).isOne()
         }
-
 
         @Test
         @Transactional

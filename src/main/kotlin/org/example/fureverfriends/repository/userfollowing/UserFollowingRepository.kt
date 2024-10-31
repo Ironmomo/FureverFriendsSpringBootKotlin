@@ -15,4 +15,5 @@ interface UserFollowingRepository: JpaRepository<UserFollowing, UserFollowingKey
     @EntityGraph(attributePaths = ["follower", "following"])
     fun findUserFollowingsByIdFollowerAndStatus(followerId: String, status: UserRelationStatus, pageable: Pageable): Page<UserFollowing>
 
+    fun findUserFollowingByIdFollowerAndIdFollowingAndStatus(followerId: String, followingId: String, status: UserRelationStatus): UserFollowing?
 }
