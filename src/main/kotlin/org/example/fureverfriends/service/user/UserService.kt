@@ -31,12 +31,6 @@ class UserService(
         return FoundUsersDTO(foundUsers = foundUsers.map { it.mapToDTO() })
     }
 
-    fun findUserByUsername(username: String): User {
-        val user = userRepository.findUserByUsername(username)
-        checkNotNull(user) { "User doesn't exist" }
-        return user
-    }
-
     private fun checkPassword(user: CreateUserRequestDTO) {
         if (user.password.length < 8) throw IllegalArgumentException("Password must be at least 8 characters long")
     }

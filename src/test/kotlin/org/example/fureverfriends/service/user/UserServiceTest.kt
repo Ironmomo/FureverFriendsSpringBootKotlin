@@ -10,7 +10,6 @@ import org.example.fureverfriends.model.user.User
 import org.example.fureverfriends.processor.NGramSearchProcessor
 import org.example.fureverfriends.repository.user.UserRepository
 import org.example.fureverfriends.stubs.stubUser
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
@@ -85,41 +84,6 @@ class UserServiceTest {
             val throwable = catchThrowable { userService.createUser(userRequest) }
 
             assertThat(throwable).isInstanceOf(IllegalArgumentException::class.java).hasMessage("Password must be at least 8 characters long")
-        }
-    }
-
-    @Nested
-    inner class FindUserByUsernameTests {
-        @Test
-        fun `should find user by username`() {
-            val user = stubUser().copy(username = "username", password = "password")
-            val userRepository: UserRepository = mock {
-                on { findUserByUsername(user.username) } doReturn user
-            }
-            val userService = createUserService(
-                userRepository = userRepository
-            )
-
-            val returnedUser = userService.findUserByUsername(user.username)
-
-            assertAll(
-                { assertEquals(user, returnedUser) },
-                { verify(userRepository).findUserByUsername(user.username) }
-            )
-        }
-
-        @Test
-        fun `should throw IllegalStateException if user not existing`() {
-            val user = stubUser().copy(username = "username", password = "password")
-            val userService = createUserService(
-                userRepository = mock {
-                    on { findUserByUsername(user.username) } doReturn null
-                }
-            )
-
-            val throwable = catchThrowable { userService.findUserByUsername(user.username) }
-
-            assertThat(throwable).isInstanceOf(IllegalStateException::class.java).hasMessage("User doesn't exist")
         }
     }
 
