@@ -25,7 +25,6 @@ class ModelTest {
                 content = "some content",
                 createdAt = createdAt,
                 likes = 1,
-                dislikes = 1,
                 user = user
             )
 
@@ -38,7 +37,6 @@ class ModelTest {
                 content = "some content",
                 createdAt = createdAt,
                 likes = 1,
-                dislikes = 1,
                 user = UserDTO(user.username)
             )
             )

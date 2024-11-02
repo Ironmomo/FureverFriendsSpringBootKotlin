@@ -29,7 +29,6 @@ fun stubPost(id: Int = 1): Post = Post(
     content = "content $id",
     createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
     likes = 1,
-    dislikes = 1,
     user = stubUser()
 )
 
@@ -52,9 +51,15 @@ fun stubJwtProperties(): JwtProperties = JwtProperties(
 )
 
 fun stubCreateUserRequestDTO(): CreateUserRequestDTO = CreateUserRequestDTO(
-    username = "username", password = "password"
+    username = "username",
+    password = "password"
 )
 
 fun stubPostDTO(id: Int = 1): PostResponseDTO = PostResponseDTO(
-id = id.toLong(), title = "title $id", content = "content $id", createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS), likes = 1, dislikes = 1, user = stubUserDTO()
+    id = id.toLong(),
+    title = "title $id",
+    content = "content $id",
+    createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+    likes = 1,
+    user = stubUserDTO()
 )

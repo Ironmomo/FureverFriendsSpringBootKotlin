@@ -31,12 +31,9 @@ data class Post(
     @Column
     val likes: Int = 0,
 
-    @Column
-    val dislikes: Int = 0,
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     val user: User
 ) {
-    fun mapToDTO() = PostResponseDTO(id, title, content, createdAt, likes, dislikes, user = user.mapToDTO())
+    fun mapToDTO() = PostResponseDTO(id, title, content, createdAt, likes, user = user.mapToDTO())
 }

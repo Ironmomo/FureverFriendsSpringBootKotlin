@@ -15,7 +15,6 @@ CREATE TABLE posts (
     content VARCHAR NOT NULL,
     created_at DATETIME NOT NULL,
     likes INT DEFAULT 0,
-    dislikes INT DEFAULT 0,
     user_id VARCHAR,
     CONSTRAINT fk_post_user FOREIGN KEY (user_id) REFERENCES users(username) ON DELETE CASCADE
 );

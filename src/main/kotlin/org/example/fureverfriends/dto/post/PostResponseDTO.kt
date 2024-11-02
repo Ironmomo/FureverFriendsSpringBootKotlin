@@ -9,6 +9,5 @@ data class PostResponseDTO(
     val content: String,
     val createdAt: LocalDateTime,
     val likes: Int,
-    val dislikes: Int,
     val user: UserDTO
 )
