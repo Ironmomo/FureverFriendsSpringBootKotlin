@@ -26,7 +26,7 @@ import kotlin.test.assertTrue
 
 
 @DataJpaTest
-internal class PostRepositoryTest @Autowired constructor(
+class PostRepositoryTest @Autowired constructor(
     private val postRepository: PostRepository,
     private val entityManager: EntityManager,
 ) {

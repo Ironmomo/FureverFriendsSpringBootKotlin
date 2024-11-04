@@ -3,14 +3,17 @@ package org.example.fureverfriends.service.post
 import org.example.fureverfriends.config.post.PaginationProperties
 import org.example.fureverfriends.dto.post.LatestPostsDTO
 import org.example.fureverfriends.model.userfollowing.UserRelationStatus.ACCEPTED
+import org.example.fureverfriends.processor.PostLikeProcessor
 import org.example.fureverfriends.repository.post.PostRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class PostService(
     private val postRepository: PostRepository,
+    private val postLikeProcessor: PostLikeProcessor,
     paginationProperties: PaginationProperties
 ) {
     private val pageSize = paginationProperties.pageSize
@@ -22,5 +25,12 @@ class PostService(
             posts = postsPage.content.map { it.mapToDTO() },
             isLastPage = postsPage.isLast
         )
+    }
+
+    @Transactional
+    fun likePost(currentUsername: String, postId: Long) {
+        val post = postRepository.findPostById(postId)
+        checkNotNull(post) { "Post not found" }
+        postLikeProcessor.updateLike(currentUsername, post.user.username, post)
     }
 }

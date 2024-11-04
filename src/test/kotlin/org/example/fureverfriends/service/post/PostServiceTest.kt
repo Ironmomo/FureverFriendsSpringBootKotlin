@@ -1,16 +1,21 @@
 package org.example.fureverfriends.service.post
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowable
 import org.example.fureverfriends.config.post.PaginationProperties
 import org.example.fureverfriends.dto.post.LatestPostsDTO
 import org.example.fureverfriends.dto.post.PostResponseDTO
 import org.example.fureverfriends.model.post.Post
 import org.example.fureverfriends.model.userfollowing.UserRelationStatus.ACCEPTED
+import org.example.fureverfriends.processor.PostLikeProcessor
 import org.example.fureverfriends.repository.post.PostRepository
 import org.example.fureverfriends.stubs.stubPost
+import org.example.fureverfriends.stubs.stubUser
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.assertAll
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -98,12 +103,54 @@ class PostServiceTest {
             )
         }
     }
+    
+    @Nested
+    inner class LikePostTests {
+        @Test
+        fun `should call processor`() {
+            val currentUserName = "SomeUser"
+            val post = Post(
+                title = "SomeTitle",
+                content = "SomeContnet",
+                user = stubUser()
+            )
+            val repository: PostRepository = mock {
+                on { findPostById(post.id) } doReturn post
+            }
+            val postLikeProcessor: PostLikeProcessor = mock()
+            val service = createPostService(
+                postRepository = repository,
+                postLikeProcessor = postLikeProcessor
+            )
+            
+            service.likePost(currentUserName, post.id)
+            
+            assertAll(
+                { verify(repository).findPostById(post.id) },
+                { verify(postLikeProcessor).updateLike(currentUserName, post.user.username, post) }
+            )
+        }
+
+        @Test
+        fun `should throw error on missing post`() {
+            val currentUserName = "SomeUser"
+            val service = createPostService()
+
+            val throwable = catchThrowable {
+                service.likePost(currentUserName, 1)
+            }
+
+            assertThat(throwable).isInstanceOf(IllegalStateException::class.java).hasMessageContaining("Post not found")
+        }
+    }
 
     private fun createPostService(
         postRepository: PostRepository = mock(),
-        paginationProperties: PaginationProperties = mock()
+        paginationProperties: PaginationProperties = mock(),
+        postLikeProcessor: PostLikeProcessor = mock()
     ) = PostService(
         postRepository = postRepository,
-        paginationProperties = paginationProperties
+        paginationProperties = paginationProperties,
+        postLikeProcessor = postLikeProcessor
     )
 }
