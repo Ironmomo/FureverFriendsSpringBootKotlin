@@ -5,6 +5,7 @@ import org.example.fureverfriends.service.post.PostService
 import org.example.fureverfriends.stubs.stubPostDTO
 import org.junit.jupiter.api.Nested
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -13,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.temporal.ChronoUnit.SECONDS
@@ -27,9 +29,44 @@ class PostControllerTest {
     private lateinit var postService: PostService
 
     @Nested
+    inner class LikePostTests {
+        @Test
+        fun `on not authenticated return 403`() {
+            mockMvc.perform(post("/api/post/like").param("postId", "2"))
+                .andExpect(status().isForbidden)
+        }
+
+        @Test
+        @WithMockUser(username = "someUser")
+        fun `should call service`() {
+            val postId: Long = 2
+
+            mockMvc.perform(post("/api/post/like").param("postId", postId.toString()))
+            .andExpect(status().isAccepted)
+            verify(postService).likePost("someUser", postId)
+        }
+
+        @Test
+        @WithMockUser(username = "someUser")
+        fun `on wrong parameter type should return 406`() {
+            val invalidParameter = "invalid"
+
+            mockMvc.perform(post("/api/post/like").param("postId", invalidParameter))
+                .andExpect(status().isNotAcceptable)
+        }
+
+        @Test
+        @WithMockUser(username = "someUser")
+        fun `on missing parameter type should return 400`() {
+            mockMvc.perform(post("/api/post/like"))
+                .andExpect(status().isBadRequest)
+        }
+    }
+
+    @Nested
     inner class GetLatestPostTests {
         @Test
-        fun `test getLatestPosts not authenticated`() {
+        fun `on not authenticated return 403`() {
             mockMvc.perform(get("/api/post/latest").param("page", "0"))
                 .andExpect(status().isForbidden)
         }
