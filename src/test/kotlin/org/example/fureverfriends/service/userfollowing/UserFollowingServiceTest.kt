@@ -124,8 +124,53 @@ class UserFollowingServiceTest {
 
             assertThat(throwable).isInstanceOf(IllegalStateException::class.java).hasMessageContaining("There is no pending UserRelation")
         }
+    }
 
+    @Nested
+    inner class RejectFollowingRequestTests {
+        @Test
+        fun `should delete pending relation`() {
+            val user1 = stubUser(1)
+            val user2 = stubUser(2)
+            val userFollowing = UserFollowing(
+                id = UserFollowingKey(
+                    follower = user1.username, following = user2.username
+                ),
+                follower = user1,
+                following = user2,
+                status = PENDING
+            )
+            val userFollowingRepository: UserFollowingRepository = mock {
+                on { findUserFollowingByIdFollowerAndIdFollowingAndStatus(
+                    followerId = user1.username,
+                    followingId = user2.username,
+                    status = PENDING
+                ) } doReturn userFollowing
+            }
+            val service = createService(
+                userFollowingRepository = userFollowingRepository
+            )
 
+            service.rejectFollowingRequest(followerId = user1.username, followingId = user2.username)
+
+            assertAll(
+                {
+                    verify(userFollowingRepository).findUserFollowingByIdFollowerAndIdFollowingAndStatus(followerId = user1.username, followingId = user2.username, status = PENDING)
+                    verify(userFollowingRepository).delete(userFollowing)
+                }
+            )
+        }
+
+        @Test
+        fun `should throw error on non existing relation`() {
+            val user1 = stubUser(1)
+            val user2 = stubUser(2)
+            val service = createService()
+
+            val throwable = catchThrowable { service.acceptFollowingRequest(user1.username, user2.username) }
+
+            assertThat(throwable).isInstanceOf(IllegalStateException::class.java).hasMessageContaining("There is no pending UserRelation")
+        }
     }
 
     private fun createService(

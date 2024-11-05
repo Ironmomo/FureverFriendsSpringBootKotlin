@@ -39,4 +39,14 @@ class UserFollowingService(
         val updatedUserRelation = userRelation.copy(status = ACCEPTED)
         userFollowingRepository.save(updatedUserRelation)
     }
+
+    fun rejectFollowingRequest(followerId: String, followingId: String) {
+        val userRelation = userFollowingRepository.findUserFollowingByIdFollowerAndIdFollowingAndStatus(
+            followerId = followerId,
+            followingId = followingId,
+            status = PENDING
+        )
+        checkNotNull(userRelation) { "There is no pending UserRelation" }
+        userFollowingRepository.delete(userRelation)
+    }
 }
