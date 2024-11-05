@@ -2,6 +2,8 @@ package org.example.fureverfriends.service.userfollowing
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
+import org.example.fureverfriends.config.post.PaginationProperties
+import org.example.fureverfriends.dto.user.FoundUsersDTO
 import org.example.fureverfriends.model.user.User
 import org.example.fureverfriends.model.userfollowing.UserFollowing
 import org.example.fureverfriends.model.userfollowing.UserFollowingKey
@@ -21,6 +23,8 @@ import org.junit.jupiter.params.provider.ArgumentsSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import java.util.stream.Stream
 
 class UserFollowingServiceTest {
@@ -172,13 +176,121 @@ class UserFollowingServiceTest {
             assertThat(throwable).isInstanceOf(IllegalStateException::class.java).hasMessageContaining("There is no pending UserRelation")
         }
     }
+    
+    @Nested
+    inner class FindFollowingsTests {
+        @Test
+        fun `should return user followings with remaining user followings`() {
+            val currentUser = "someUser"
+            val pageSizeValue = 1
+            val pageIndexValue = 0
+            val user1 = stubUser(1)
+            val user2 = stubUser(2)
+            val user3 = stubUser(3)
+            val userFollowings = listOf(
+                UserFollowing(
+                    id = UserFollowingKey(follower = user1.username, following = user2.username), 
+                    follower = user1, 
+                    following = user2, 
+                    status = ACCEPTED
+                ),
+                UserFollowing(
+                    id = UserFollowingKey(follower = user1.username, following = user3.username),
+                    follower = user1,
+                    following = user3,
+                    status = ACCEPTED
+                )
+            )
+            val followingsDTO = userFollowings.map { it.following.mapToDTO() }
+            val pageRequest = PageRequest.of(pageIndexValue, pageSizeValue)
+            val pagedUserFollowings = PageImpl(userFollowings, pageRequest, userFollowings.size.toLong())
+            val service = createService(
+                userFollowingRepository = mock {
+                    on { findUserFollowingsByIdFollowerAndStatus(currentUser, ACCEPTED, pageRequest) } doReturn pagedUserFollowings
+                },
+                paginationProperties = mock { on { pageSize } doReturn pageSizeValue }
+            )
+            
+            val followings = service.findFollowings(currentUser, pageIndexValue)
+            
+            assertThat(followings).isEqualTo(
+                FoundUsersDTO(
+                    foundUsers = followingsDTO,
+                    isLastPage = false
+                )
+            )
+        }
+
+        @Test
+        fun `should return user followings without remaining user followings`() {
+            val currentUser = "someUser"
+            val pageSizeValue = 1
+            val pageIndexValue = 0
+            val user1 = stubUser(1)
+            val user2 = stubUser(2)
+            val userFollowings = listOf(
+                UserFollowing(
+                    id = UserFollowingKey(follower = user1.username, following = user2.username),
+                    follower = user1,
+                    following = user2,
+                    status = ACCEPTED
+                )
+            )
+            val followingsDTO = userFollowings.map { it.following.mapToDTO() }
+            val pageRequest = PageRequest.of(pageIndexValue, pageSizeValue)
+            val pagedUserFollowings = PageImpl(userFollowings, pageRequest, userFollowings.size.toLong())
+            val service = createService(
+                userFollowingRepository = mock {
+                    on { findUserFollowingsByIdFollowerAndStatus(currentUser, ACCEPTED, pageRequest) } doReturn pagedUserFollowings
+                },
+                paginationProperties = mock { on { pageSize } doReturn pageSizeValue }
+            )
+
+            val followings = service.findFollowings(currentUser, pageIndexValue)
+
+            assertThat(followings).isEqualTo(
+                FoundUsersDTO(
+                    foundUsers = followingsDTO,
+                    isLastPage = true
+                )
+            )
+        }
+
+        @Test
+        fun `should return user followings without user followings`() {
+            val currentUser = "someUser"
+            val pageSizeValue = 1
+            val pageIndexValue = 0
+            val userFollowings = emptyList<UserFollowing>()
+            val followingsDTO = userFollowings.map { it.following.mapToDTO() }
+            val pageRequest = PageRequest.of(pageIndexValue, pageSizeValue)
+            val pagedUserFollowings = PageImpl(userFollowings, pageRequest, 0)
+            val service = createService(
+                userFollowingRepository = mock {
+                    on { findUserFollowingsByIdFollowerAndStatus(currentUser, ACCEPTED, pageRequest) } doReturn pagedUserFollowings
+                },
+                paginationProperties = mock { on { pageSize } doReturn pageSizeValue }
+            )
+
+            val followings = service.findFollowings(currentUser, pageIndexValue)
+
+            assertThat(followings).isEqualTo(
+                FoundUsersDTO(
+                    foundUsers = followingsDTO,
+                    isLastPage = true
+                )
+            )
+        }
+    }
 
     private fun createService(
         userFollowingRepository: UserFollowingRepository = mock(),
-        userRepository: UserRepository = mock()
+        userRepository: UserRepository = mock(),
+        paginationProperties: PaginationProperties = mock()
     ) = UserFollowingService(
         userFollowingRepository = userFollowingRepository,
-        userRepository = userRepository
+        userRepository = userRepository,
+        paginationProperties = paginationProperties
     )
 }
 
