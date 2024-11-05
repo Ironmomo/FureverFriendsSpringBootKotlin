@@ -86,6 +86,20 @@ class PostRepositoryTest @Autowired constructor(
         }
     }
 
+    @Nested
+    open inner class FindPostByIdTests {
+        @Test
+        fun `on findPostById should prevent n + 1 problem for user`() {
+            val post = postRepository.findPostById(post1.id)
+
+            assertAll(
+                { assertThat(post).isEqualTo(post1) },
+                { assertThat(hibernateStatistics.collectionFetchCount).isZero() },
+                { assertThat(hibernateStatistics.prepareStatementCount).isOne() }
+            )
+        }
+    }
+
     private fun initUtil() {
         val sessionFactory = entityManager.unwrap(Session::class.java).sessionFactory
         hibernateStatistics = sessionFactory.statistics
