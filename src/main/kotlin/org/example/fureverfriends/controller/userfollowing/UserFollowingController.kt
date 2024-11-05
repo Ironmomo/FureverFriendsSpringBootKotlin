@@ -3,6 +3,7 @@ package org.example.fureverfriends.controller.userfollowing
 import org.example.fureverfriends.dto.userfollowing.UserFollowingRequestDTO
 import org.example.fureverfriends.service.userfollowing.UserFollowingService
 import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.HttpStatus.OK
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -32,5 +33,14 @@ class UserFollowingController(
         @RequestBody followingRequest: UserFollowingRequestDTO
     ) {
         userFollowingService.acceptFollowingRequest(followerId = principal.name, followingId = followingRequest.userToFollow)
+    }
+
+    @PostMapping("/reject")
+    @ResponseStatus(OK)
+    fun rejectingRequest(
+        principal: Principal,
+        @RequestBody followingRequest: UserFollowingRequestDTO
+    ) {
+        userFollowingService.rejectFollowingRequest(followerId = principal.name, followingId = followingRequest.userToFollow)
     }
 }

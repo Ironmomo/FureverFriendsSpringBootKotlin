@@ -83,4 +83,33 @@ class UserFollowingControllerTest {
                 .andExpect(status().isForbidden)
         }
     }
+
+    @Nested
+    inner class RejectFollowingRequestTests {
+        @Test
+        @WithMockUser(username = "SomeUser")
+        fun `on success`() {
+            val dto = UserFollowingRequestDTO("ToFollow")
+            val requestBody = objectMapper.writeValueAsString(dto)
+
+            mockMvc.perform(
+                post("/api/relation/reject")
+                    .contentType(APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isOk)
+            verify(userFollowingService).rejectFollowingRequest(followerId = "SomeUser", followingId = "ToFollow")
+        }
+
+        @Test
+        fun `should return 403 on missing authentication`() {
+            val dto = UserFollowingRequestDTO("ToFollow")
+            val requestBody = objectMapper.writeValueAsString(dto)
+
+            mockMvc.perform(
+                post("/api/relation/reject")
+                    .contentType(APPLICATION_JSON)
+                    .content(requestBody))
+                .andExpect(status().isForbidden)
+        }
+    }
 }
