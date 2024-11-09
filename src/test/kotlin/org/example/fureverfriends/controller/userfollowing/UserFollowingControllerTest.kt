@@ -33,6 +33,38 @@ class UserFollowingControllerTest {
     lateinit var objectMapper: ObjectMapper
 
     @Nested
+    inner class GetFollowerTests {
+        @Test
+        fun `should return 403 on missing authentication`() {
+            mockMvc.perform(
+                get("/api/relation/followers").param("page", "0"))
+                .andExpect(status().isForbidden)
+        }
+
+        @Test
+        @WithMockUser(username = "SomeUser")
+        fun `on success`() {
+            val dto = FoundUsersDTO(
+                foundUsers = listOf(stubUserDTO()),
+                isLastPage = true
+            )
+
+            whenever(userFollowingService.findFollowers("SomeUser", 0)).doReturn(dto)
+            mockMvc.perform(get("/api/relation/followers").accept(APPLICATION_JSON))
+                .andExpect(status().isFound)
+                .andExpect(jsonPath("$.foundUsers[0].username").value(dto.foundUsers.first().username))
+                .andExpect(jsonPath("$.isLastPage").value(true))
+        }
+
+        @Test
+        @WithMockUser(username = "SomeUser")
+        fun `on invalid parameter`() {
+            mockMvc.perform(get("/api/relation/followers").param("page", "notANumber").accept(APPLICATION_JSON))
+                .andExpect(status().isNotAcceptable)
+        }
+    }
+
+    @Nested
     inner class GetFollowingsTests {
         @Test
         fun `should return 403 on missing authentication`() {

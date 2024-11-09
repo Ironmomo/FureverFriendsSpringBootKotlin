@@ -21,6 +21,15 @@ class UserFollowingController(
     private val userFollowingService: UserFollowingService
 ) {
 
+    @GetMapping("/followers")
+    @ResponseStatus(FOUND)
+    fun getFollowers(
+        principal: Principal,
+        @RequestParam(value = "page", defaultValue = "0") pageIndex: Int
+    ): FoundUsersDTO {
+        return userFollowingService.findFollowers(principal.name, pageIndex)
+    }
+
     @GetMapping("/followings")
     @ResponseStatus(FOUND)
     fun getFollowings(
