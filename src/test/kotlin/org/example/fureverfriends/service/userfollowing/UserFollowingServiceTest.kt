@@ -283,6 +283,112 @@ class UserFollowingServiceTest {
         }
     }
 
+    @Nested
+    inner class FindFollowersTests {
+        @Test
+        fun `should return user followers with remaining user followings`() {
+            val currentUser = "someUser"
+            val pageSizeValue = 1
+            val pageIndexValue = 0
+            val user1 = stubUser(1)
+            val user2 = stubUser(2)
+            val user3 = stubUser(3)
+            val userFollowings = listOf(
+                UserFollowing(
+                    id = UserFollowingKey(follower = user1.username, following = user2.username),
+                    follower = user1,
+                    following = user2,
+                    status = ACCEPTED
+                ),
+                UserFollowing(
+                    id = UserFollowingKey(follower = user1.username, following = user3.username),
+                    follower = user1,
+                    following = user3,
+                    status = ACCEPTED
+                )
+            )
+            val followersDTO = userFollowings.map { it.follower.mapToDTO() }
+            val pageRequest = PageRequest.of(pageIndexValue, pageSizeValue)
+            val pagedUserFollowings = PageImpl(userFollowings, pageRequest, userFollowings.size.toLong())
+            val service = createService(
+                userFollowingRepository = mock {
+                    on { findUserFollowingsByIdFollowingAndStatus(currentUser, ACCEPTED, pageRequest) } doReturn pagedUserFollowings
+                },
+                paginationProperties = mock { on { pageSize } doReturn pageSizeValue }
+            )
+
+            val followings = service.findFollowers(currentUser, pageIndexValue)
+
+            assertThat(followings).isEqualTo(
+                FoundUsersDTO(
+                    foundUsers = followersDTO,
+                    isLastPage = false
+                )
+            )
+        }
+
+        @Test
+        fun `should return user followings without remaining user followers`() {
+            val currentUser = "someUser"
+            val pageSizeValue = 1
+            val pageIndexValue = 0
+            val user1 = stubUser(1)
+            val user2 = stubUser(2)
+            val userFollowings = listOf(
+                UserFollowing(
+                    id = UserFollowingKey(follower = user1.username, following = user2.username),
+                    follower = user1,
+                    following = user2,
+                    status = ACCEPTED
+                )
+            )
+            val followingsDTO = userFollowings.map { it.follower.mapToDTO() }
+            val pageRequest = PageRequest.of(pageIndexValue, pageSizeValue)
+            val pagedUserFollowings = PageImpl(userFollowings, pageRequest, userFollowings.size.toLong())
+            val service = createService(
+                userFollowingRepository = mock {
+                    on { findUserFollowingsByIdFollowingAndStatus(currentUser, ACCEPTED, pageRequest) } doReturn pagedUserFollowings
+                },
+                paginationProperties = mock { on { pageSize } doReturn pageSizeValue }
+            )
+
+            val followings = service.findFollowers(currentUser, pageIndexValue)
+
+            assertThat(followings).isEqualTo(
+                FoundUsersDTO(
+                    foundUsers = followingsDTO,
+                    isLastPage = true
+                )
+            )
+        }
+
+        @Test
+        fun `should return user followings without user followers`() {
+            val currentUser = "someUser"
+            val pageSizeValue = 1
+            val pageIndexValue = 0
+            val userFollowings = emptyList<UserFollowing>()
+            val followingsDTO = userFollowings.map { it.following.mapToDTO() }
+            val pageRequest = PageRequest.of(pageIndexValue, pageSizeValue)
+            val pagedUserFollowings = PageImpl(userFollowings, pageRequest, 0)
+            val service = createService(
+                userFollowingRepository = mock {
+                    on { findUserFollowingsByIdFollowingAndStatus(currentUser, ACCEPTED, pageRequest) } doReturn pagedUserFollowings
+                },
+                paginationProperties = mock { on { pageSize } doReturn pageSizeValue }
+            )
+
+            val followings = service.findFollowers(currentUser, pageIndexValue)
+
+            assertThat(followings).isEqualTo(
+                FoundUsersDTO(
+                    foundUsers = followingsDTO,
+                    isLastPage = true
+                )
+            )
+        }
+    }
+
     private fun createService(
         userFollowingRepository: UserFollowingRepository = mock(),
         userRepository: UserRepository = mock(),

@@ -64,4 +64,13 @@ class UserFollowingService(
             isLastPage = followingPage.isLast
         )
     }
+
+    fun findFollowers(currentUsername: String, index: Int): FoundUsersDTO {
+        val pageable = PageRequest.of(index, pageSize)
+        val followingPage = userFollowingRepository.findUserFollowingsByIdFollowingAndStatus(currentUsername, ACCEPTED, pageable)
+        return FoundUsersDTO(
+            foundUsers = followingPage.content.map { it.follower.mapToDTO() },
+            isLastPage = followingPage.isLast
+        )
+    }
 }

@@ -110,6 +110,64 @@ class UserFollowingRepositoryTest @Autowired constructor(
         }
     }
 
+    @Nested
+    open inner class FindUserFollowingsByFollowingIdTests {
+
+        @Test
+        @Transactional
+        open fun `should prevent n + 1 problem`() {
+            val page = PageRequest.of(0, 10)
+
+            userFollowingRepository.findUserFollowingsByIdFollowingAndStatus(
+                followingId = user1.username,
+                status = ACCEPTED,
+                pageable = page
+            )
+
+            assertThat(hibernateStatistics.prepareStatementCount).isOne()
+        }
+
+        @Test
+        @Transactional
+        open fun `findUserFollowingsByFollowerId should return user followers`() {
+            val page = PageRequest.of(0, 10)
+
+            val foundAccepted = userFollowingRepository.findUserFollowingsByIdFollowingAndStatus(
+                followingId = user1.username,
+                status = ACCEPTED,
+                pageable = page
+            )
+
+            val foundPending = userFollowingRepository.findUserFollowingsByIdFollowingAndStatus(
+                followingId = user3.username,
+                status = PENDING,
+                pageable = page
+            )
+
+            assertAll(
+                { assertThat(foundAccepted.content.size).isEqualTo(1) },
+                { assertThat(foundAccepted.content).isEqualTo(listOf(entry3)) },
+                { assertThat(foundPending.content.size).isEqualTo(1) },
+                { assertThat(foundPending.content).isEqualTo(listOf(entry2)) }
+            )
+        }
+
+        @Test
+        @Transactional
+        open fun `findUserFollowingsByFollowerId should return no user followers`() {
+            val page = PageRequest.of(0, 10)
+
+            val found = userFollowingRepository.findUserFollowingsByIdFollowingAndStatus(
+                followingId = user3.username,
+                status = ACCEPTED,
+                pageable = page
+            )
+
+            assertThat(found.content.size).isEqualTo(0)
+        }
+    }
+
+
     @BeforeEach
     fun setUp() {
         initData()
