@@ -16,6 +16,7 @@ import org.junit.jupiter.api.assertAll
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 
 class UserServiceTest {
@@ -110,6 +111,32 @@ class UserServiceTest {
                     )
                 )) }
             )
+        }
+    }
+
+    @Nested
+    inner class GetUserByUsernameTests {
+        @Test
+        fun `should find user by username`() {
+            val user = stubUser()
+            val service = createUserService(
+                userRepository = mock {
+                    on { findUserByUsername(user.username) } doReturn user
+                }
+            )
+
+            val returned = service.getUserByUsername(user.username)
+
+            assertThat(returned).isEqualTo(user)
+        }
+
+        @Test
+        fun `should throw UsernameNotFoundException when user not found`() {
+            val service = createUserService()
+
+            val throwable = catchThrowable { service.getUserByUsername("someUser") }
+
+            assertThat(throwable).isInstanceOf(UsernameNotFoundException::class.java)
         }
     }
 

@@ -6,6 +6,7 @@ import org.example.fureverfriends.model.user.User
 import org.example.fureverfriends.processor.NGramSearchProcessor
 import org.example.fureverfriends.repository.user.UserRepository
 import org.example.fureverfriends.util.checkExpectNull
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -30,6 +31,8 @@ class UserService(
         val foundUsers = nGramSearchProcessor.nGramSearch(searchString)
         return FoundUsersDTO(foundUsers = foundUsers.map { it.mapToDTO() })
     }
+
+    fun getUserByUsername(username: String): User = userRepository.findUserByUsername(username) ?: throw UsernameNotFoundException("User $username not found")
 
     private fun checkPassword(user: CreateUserRequestDTO) {
         if (user.password.length < 8) throw IllegalArgumentException("Password must be at least 8 characters long")
