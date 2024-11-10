@@ -34,6 +34,8 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
     implementation("org.springframework.boot:spring-boot-starter-security")
     testImplementation("org.springframework.security:spring-security-test")
+    implementation("com.google.code.gson:gson:2.11.0")
+
 }
 
 kotlin {
