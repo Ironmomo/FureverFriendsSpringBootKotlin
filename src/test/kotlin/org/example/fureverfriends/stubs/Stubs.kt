@@ -3,6 +3,9 @@ package org.example.fureverfriends.stubs
 import org.example.fureverfriends.dto.post.PostResponseDTO
 import org.example.fureverfriends.dto.user.CreateUserRequestDTO
 import org.example.fureverfriends.dto.user.UserDTO
+import org.example.fureverfriends.model.notification.Notification
+import org.example.fureverfriends.model.notification.NotificationStatus.NEW
+import org.example.fureverfriends.model.notification.NotificationType.LikeNotification
 import org.example.fureverfriends.model.post.Post
 import org.example.fureverfriends.model.user.Role.USER
 import org.example.fureverfriends.model.user.User
@@ -62,4 +65,12 @@ fun stubPostDTO(id: Int = 1): PostResponseDTO = PostResponseDTO(
     createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
     likes = 1,
     user = stubUserDTO()
+)
+
+fun stubNotification(id: Int = 1): Notification = Notification(
+    id = id.toLong(),
+    type = LikeNotification,
+    payload = "some Payload",
+    status = NEW,
+    user = stubUser(id)
 )
