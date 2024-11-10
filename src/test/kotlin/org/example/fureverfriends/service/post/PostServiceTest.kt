@@ -148,7 +148,7 @@ class PostServiceTest {
         postRepository: PostRepository = mock(),
         paginationProperties: PaginationProperties = mock(),
         postLikeProcessor: PostLikeProcessor = mock()
-    ) = PostService(
+    ) = PostServiceImpl(
         postRepository = postRepository,
         paginationProperties = paginationProperties,
         postLikeProcessor = postLikeProcessor
