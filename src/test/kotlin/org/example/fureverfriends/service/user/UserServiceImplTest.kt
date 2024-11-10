@@ -19,7 +19,7 @@ import org.mockito.kotlin.verify
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 
-class UserServiceTest {
+class UserServiceImplTest {
     @Nested
     inner class CreateUserTests {
         @Test
@@ -145,7 +145,7 @@ class UserServiceTest {
         encoder: PasswordEncoder = mock(),
         nGramSearchProcessor: NGramSearchProcessor = mock()
     ) =
-        UserService(
+        UserServiceImpl(
             userRepository = userRepository,
             encoder = encoder,
             nGramSearchProcessor = nGramSearchProcessor,
