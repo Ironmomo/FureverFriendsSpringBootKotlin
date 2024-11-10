@@ -27,7 +27,7 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import java.util.stream.Stream
 
-class UserFollowingServiceTest {
+class UserFollowingServiceImplTest {
 
     @Nested
     inner class FollowingRequestTests {
@@ -393,7 +393,7 @@ class UserFollowingServiceTest {
         userFollowingRepository: UserFollowingRepository = mock(),
         userRepository: UserRepository = mock(),
         paginationProperties: PaginationProperties = mock()
-    ) = UserFollowingService(
+    ) = UserFollowingServiceImpl(
         userFollowingRepository = userFollowingRepository,
         userRepository = userRepository,
         paginationProperties = paginationProperties
