@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -41,13 +42,12 @@ class NotificationControllerTest {
         )
         whenever(notificationService.loadNotificationByUser("someUser")).thenReturn(listOf(notificationDTO))
 
-        mockMvc.perform(get("/api/notification"))
-            .andExpect(status().isFound)
+        mockMvc.perform(get("/api/notification")
+            .accept(APPLICATION_JSON))
+            .andExpect(status().isOk)
             .andExpect(jsonPath("$[0].payload").value("somePayload"))
             .andExpect(jsonPath("$[0].status").value("NEW"))
             .andExpect(jsonPath("$[0].type").value("LikeNotification"))
         verify(notificationService).loadNotificationByUser("someUser")
     }
-
-
 }
