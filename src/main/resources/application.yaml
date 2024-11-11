@@ -16,3 +16,8 @@ jwt:
   refresh-token-expiration: 86400000
 pagination:
   page-size: 10
+springdoc:
+  paths-to-match: "/api/**"
+  swagger-ui:
+    enabled: true
+  packages-to-scan: org.example.fureverfriends
