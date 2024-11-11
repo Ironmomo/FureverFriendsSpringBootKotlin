@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 @ControllerAdvice
 class GlobalErrorHandling {
 
-    @ExceptionHandler(IllegalStateException::class )
+    @ExceptionHandler(IllegalStateException::class)
     fun handleConflict(exception: IllegalStateException): ResponseEntity<ErrorResponseDTO> {
         val errorResponse = ErrorResponseDTO(
             error = exception.message ?: "Conflict occurred"
@@ -18,11 +18,19 @@ class GlobalErrorHandling {
         return ResponseEntity(errorResponse, HttpStatus.CONFLICT)
     }
 
-    @ExceptionHandler(IllegalArgumentException::class )
+    @ExceptionHandler(IllegalArgumentException::class)
     fun handleConflict(exception: IllegalArgumentException): ResponseEntity<ErrorResponseDTO> {
         val errorResponse = ErrorResponseDTO(
             error = exception.message ?: "Conflict occurred"
         )
         return ResponseEntity(errorResponse, HttpStatus.NOT_ACCEPTABLE)
+    }
+
+    @ExceptionHandler(IllegalAccessException::class)
+    fun handleConflict(exception: IllegalAccessException): ResponseEntity<ErrorResponseDTO> {
+        val errorResponse = ErrorResponseDTO(
+            error = exception.message ?: "Illegal access exception"
+        )
+        return ResponseEntity(errorResponse, HttpStatus.UNAUTHORIZED)
     }
 }
