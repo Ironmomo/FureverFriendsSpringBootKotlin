@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.example.fureverfriends.api.dto.user.CreateUserRequestDTO
 import org.example.fureverfriends.api.dto.user.FoundUsersDTO
 import org.example.fureverfriends.api.dto.user.UserDTO
+import org.example.fureverfriends.api.uriprovider.UserUriProviderImpl
 import org.example.fureverfriends.processing.service.user.UserService
 import org.junit.jupiter.api.Nested
 import org.mockito.kotlin.doReturn
@@ -32,6 +33,8 @@ class UserControllerTest {
     private lateinit var userService: UserService
     @Autowired
     lateinit var objectMapper: ObjectMapper
+    @Autowired
+    lateinit var userUriProviderImpl: UserUriProviderImpl
 
      @Nested
      inner class SearchUsersTests {
@@ -39,14 +42,14 @@ class UserControllerTest {
          @WithMockUser
          fun `should return found users`() {
              val searchString = "something"
-             val founUsersDTO = org.example.fureverfriends.api.dto.user.FoundUsersDTO(
-                 foundUsers = listOf(org.example.fureverfriends.api.dto.user.UserDTO("someUser"))
+             val founUsersDTO = FoundUsersDTO(
+                 foundUsers = listOf(UserDTO("someUser"))
              )
 
              whenever(userService.searchForUser(searchString)).doReturn(founUsersDTO)
 
              mockMvc.perform(
-                 get("/api/user/search/$searchString")
+                 get(userUriProviderImpl.getSearchUserUri(searchString))
              ).andExpect(status().isFound)
                  .andExpect(jsonPath("$.foundUsers[0].username").value("someUser"))
                  .andExpect(jsonPath("$.foundUsers[1]").doesNotExist())
@@ -59,7 +62,7 @@ class UserControllerTest {
              val searchString = "something"
 
              mockMvc.perform(
-                 get("/api/user/search/$searchString")
+                 get(userUriProviderImpl.getSearchUserUri(searchString))
              ).andExpect(status().isForbidden)
          }
      }
@@ -68,13 +71,13 @@ class UserControllerTest {
     inner class CreateUserTests {
         @Test
         fun `should create new user and return ok`() {
-            val createUserRequestDTO = org.example.fureverfriends.api.dto.user.CreateUserRequestDTO(
+            val createUserRequestDTO = CreateUserRequestDTO(
                 username = "fancyUser", password = "password"
             )
             val requestBody = objectMapper.writeValueAsString(createUserRequestDTO)
 
             mockMvc.perform(
-                post("/api/user/create")
+                post(userUriProviderImpl.getCreateUserUri())
                 .contentType(APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(status().isCreated)
@@ -83,14 +86,14 @@ class UserControllerTest {
 
         @Test
         fun `should return 409 on user existing`() {
-            val createUserRequestDTO = org.example.fureverfriends.api.dto.user.CreateUserRequestDTO(
+            val createUserRequestDTO = CreateUserRequestDTO(
                 username = "fancyUser", password = "soSecret"
             )
             val requestBody = objectMapper.writeValueAsString(createUserRequestDTO)
             whenever(userService.createUser(createUserRequestDTO)).doThrow(IllegalStateException("user exists"))
 
             mockMvc.perform(
-                post("/api/user/create")
+                post(userUriProviderImpl.getCreateUserUri())
                     .contentType(APPLICATION_JSON)
                     .content(requestBody))
                 .andExpect(status().isConflict)
@@ -98,14 +101,14 @@ class UserControllerTest {
 
         @Test
         fun `should return 406 on user existing`() {
-            val createUserRequestDTO = org.example.fureverfriends.api.dto.user.CreateUserRequestDTO(
+            val createUserRequestDTO = CreateUserRequestDTO(
                 username = "fancyUser", password = "soSecret"
             )
             val requestBody = objectMapper.writeValueAsString(createUserRequestDTO)
             whenever(userService.createUser(createUserRequestDTO)).doThrow(IllegalArgumentException("password not valid"))
 
             mockMvc.perform(
-                post("/api/user/create")
+                post(userUriProviderImpl.getCreateUserUri())
                     .contentType(APPLICATION_JSON)
                     .content(requestBody))
                 .andExpect(status().isNotAcceptable)

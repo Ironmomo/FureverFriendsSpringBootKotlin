@@ -25,7 +25,7 @@ class SecurityConfiguration {
                 it
                     .requestMatchers("/api/auth", "/error", "/swagger-ui/**","/v3/api-docs/**")
                     .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/user/create")
+                    .requestMatchers(HttpMethod.POST, "/api/v1/user/create")
                     .permitAll()
                     .anyRequest()
                     .authenticated()
