@@ -2,8 +2,11 @@ package org.example.fureverfriends.processing.service.post
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
+import org.example.fureverfriends.api.dto.actions.ActionDTO
+import org.example.fureverfriends.api.dto.actions.PostAction.LIKE
 import org.example.fureverfriends.api.dto.post.LatestPostsDTO
 import org.example.fureverfriends.api.dto.post.PostResponseDTO
+import org.example.fureverfriends.api.uriprovider.PostUriProviderImpl
 import org.example.fureverfriends.config.post.PaginationProperties
 import org.example.fureverfriends.model.post.Post
 import org.example.fureverfriends.model.userfollowing.UserRelationStatus.ACCEPTED
@@ -27,50 +30,76 @@ class PostServiceTest {
     inner class GetLatestPostsTests {
         @Test
         fun `test pagination page size with remaining posts`() {
+            val uri = "some uri"
             val currentUser = "someUser"
             val pageSizeValue = 4
             val pageIndexValue = 0
             val posts = listOf(stubPost(1), stubPost(2), stubPost(3), stubPost(4), stubPost(5))
-            val postDTOs = posts.map { it.mapToDTO() }
+            val postDTOs = posts.map { it.mapToDTO().copy(
+                actions = listOf(
+                    ActionDTO(
+                    uri = uri,
+                    action = LIKE
+                )
+                )
+            ) }
             val pageRequest = PageRequest.of(pageIndexValue, pageSizeValue, Sort.by(Sort.Direction.DESC, "createdAt"))
             val pagedPosts = PageImpl(posts, pageRequest, posts.size.toLong())
             val postService = createPostService(
                 postRepository = mock {
                     on { findPostsByFollowedUsers(currentUser, ACCEPTED, pageRequest) } doReturn pagedPosts
                 },
-                paginationProperties = mock { on { pageSize } doReturn pageSizeValue }
+                paginationProperties = mock { on { pageSize } doReturn pageSizeValue },
+                postUriProviderImpl = mock {
+                    on { getLikePostUri() } doReturn uri
+                    on { toExternalUri(uri) } doReturn uri
+                }
             )
 
             val latestPosts = postService.findLatestPosts(currentUser, pageIndexValue)
 
             assertThat(latestPosts).isEqualTo(
                 LatestPostsDTO(
-                    posts = postDTOs, isLastPage = false
+                    posts = postDTOs,
+                    isLastPage = false
                 )
             )
         }
 
         @Test
         fun `test pagination page size without remaining posts`() {
+            val uri = "some uri"
             val currentUser = "someUser"
             val pageSizeValue = 4
             val pageIndexValue = 0
             val posts = listOf(stubPost(1), stubPost(2), stubPost(3), stubPost(4))
-            val postDTOs = posts.map { it.mapToDTO() }
+            val postDTOs = posts.map { it.mapToDTO().copy(
+                actions = listOf(
+                    ActionDTO(
+                        uri = uri,
+                        action = LIKE
+                    )
+                )
+            ) }
             val pageRequest = PageRequest.of(pageIndexValue, pageSizeValue, Sort.by(Sort.Direction.DESC, "createdAt"))
             val pagedPosts = PageImpl(posts, pageRequest, posts.size.toLong())
             val postService = createPostService(
                 postRepository = mock {
                     on { findPostsByFollowedUsers(currentUser, ACCEPTED, pageRequest) } doReturn pagedPosts
                 },
-                paginationProperties = mock { on { pageSize } doReturn pageSizeValue }
+                paginationProperties = mock { on { pageSize } doReturn pageSizeValue },
+                postUriProviderImpl = mock {
+                    on { getLikePostUri() } doReturn uri
+                    on { toExternalUri(uri) } doReturn uri
+                }
             )
 
             val latestPosts = postService.findLatestPosts(currentUser, pageIndexValue)
 
             assertThat(latestPosts).isEqualTo(
                 LatestPostsDTO(
-                    posts = postDTOs, isLastPage = true
+                    posts = postDTOs,
+                    isLastPage = true
                 )
             )
         }
@@ -95,7 +124,8 @@ class PostServiceTest {
 
             assertThat(latestPosts).isEqualTo(
                 LatestPostsDTO(
-                    posts = postResponseDTOS, isLastPage = true
+                    posts = postResponseDTOS,
+                    isLastPage = true
                 )
             )
         }
@@ -144,10 +174,12 @@ class PostServiceTest {
     private fun createPostService(
         postRepository: PostRepository = mock(),
         paginationProperties: PaginationProperties = mock(),
-        postLikeProcessor: PostLikeProcessor = mock()
+        postLikeProcessor: PostLikeProcessor = mock(),
+        postUriProviderImpl: PostUriProviderImpl = mock()
     ) = PostServiceImpl(
         postRepository = postRepository,
         paginationProperties = paginationProperties,
-        postLikeProcessor = postLikeProcessor
+        postLikeProcessor = postLikeProcessor,
+        postUriProviderImpl = postUriProviderImpl,
     )
 }

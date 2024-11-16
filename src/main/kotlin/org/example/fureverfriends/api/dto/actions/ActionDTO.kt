@@ -10,3 +10,7 @@ interface Action
 enum class UserAction: Action {
     FOLLOW
 }
+
+enum class PostAction: Action {
+    LIKE
+}
