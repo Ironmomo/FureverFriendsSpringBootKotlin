@@ -6,7 +6,7 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import org.example.fureverfriends.dto.user.UserDTO
+import org.example.fureverfriends.api.dto.user.UserDTO
 
 @Entity
 @Table(name = "users")

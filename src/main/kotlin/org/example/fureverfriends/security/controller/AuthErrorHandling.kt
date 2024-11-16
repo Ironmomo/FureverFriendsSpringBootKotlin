@@ -1,6 +1,6 @@
 package org.example.fureverfriends.security.controller
 
-import org.example.fureverfriends.dto.error.ErrorResponseDTO
+import org.example.fureverfriends.api.dto.error.ErrorResponseDTO
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.AuthenticationException

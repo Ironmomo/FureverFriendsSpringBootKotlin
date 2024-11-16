@@ -2,17 +2,18 @@ package org.example.fureverfriends.model
 
 import com.google.gson.Gson
 import org.assertj.core.api.Assertions.assertThat
-import org.example.fureverfriends.dto.notification.NotificationStatusDTO
-import org.example.fureverfriends.dto.notification.NotificationTypeDTO
-import org.example.fureverfriends.dto.post.PostResponseDTO
-import org.example.fureverfriends.dto.user.UserDTO
+import org.example.fureverfriends.api.dto.notification.NotificationStatusDTO
+import org.example.fureverfriends.api.dto.notification.NotificationTypeDTO
+import org.example.fureverfriends.api.dto.post.PostResponseDTO
+import org.example.fureverfriends.api.dto.user.UserDTO
 import org.example.fureverfriends.model.notification.FollowRequestNotificationPayload
 import org.example.fureverfriends.model.notification.LikeNotificationPayload
 import org.example.fureverfriends.model.notification.NotificationDefinition.FollowRequestNotificationDefinitionImpl
 import org.example.fureverfriends.model.notification.NotificationDefinition.LikeNotificationDefinitionImpl
 import org.example.fureverfriends.model.notification.NotificationStatus
 import org.example.fureverfriends.model.notification.NotificationType
-import org.example.fureverfriends.model.notification.NotificationType.*
+import org.example.fureverfriends.model.notification.NotificationType.FollowRequestNotification
+import org.example.fureverfriends.model.notification.NotificationType.LikeNotification
 import org.example.fureverfriends.model.post.Post
 import org.example.fureverfriends.model.user.Role.ADMIN
 import org.example.fureverfriends.model.user.User
@@ -50,13 +51,13 @@ class ModelTest @Autowired constructor(
 
             assertThat(mapedPostDTO).isEqualTo(
                 PostResponseDTO(
-                id = 0,
-                title = "some title",
-                content = "some content",
-                createdAt = createdAt,
-                likes = 1,
-                user = UserDTO(user.username)
-            )
+                    id = 0,
+                    title = "some title",
+                    content = "some content",
+                    createdAt = createdAt,
+                    likes = 1,
+                    user = UserDTO(user.username)
+                )
             )
         }
     }

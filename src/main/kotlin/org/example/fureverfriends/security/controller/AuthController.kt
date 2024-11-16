@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.example.fureverfriends.dto.error.ErrorResponseDTO
+import org.example.fureverfriends.api.dto.error.ErrorResponseDTO
 import org.example.fureverfriends.security.dto.AuthenticationRequest
 import org.example.fureverfriends.security.dto.AuthenticationResponse
 import org.example.fureverfriends.security.service.AuthenticationService

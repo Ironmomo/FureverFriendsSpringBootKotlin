@@ -1,8 +1,8 @@
 package org.example.fureverfriends.stubs
 
-import org.example.fureverfriends.dto.post.PostResponseDTO
-import org.example.fureverfriends.dto.user.CreateUserRequestDTO
-import org.example.fureverfriends.dto.user.UserDTO
+import org.example.fureverfriends.api.dto.post.PostResponseDTO
+import org.example.fureverfriends.api.dto.user.CreateUserRequestDTO
+import org.example.fureverfriends.api.dto.user.UserDTO
 import org.example.fureverfriends.model.notification.Notification
 import org.example.fureverfriends.model.notification.NotificationStatus.NEW
 import org.example.fureverfriends.model.notification.NotificationType.LikeNotification
@@ -22,9 +22,10 @@ fun stubUser(id: Int = 1): User = User(
     role = USER
 )
 
-fun stubUserDTO(id: Int = 1): UserDTO = UserDTO(
-    username = "username $id"
-)
+fun stubUserDTO(id: Int = 1): UserDTO =
+    UserDTO(
+        username = "username $id"
+    )
 
 fun stubPost(id: Int = 1): Post = Post(
     id = id.toLong(),
@@ -53,19 +54,20 @@ fun stubJwtProperties(): JwtProperties = JwtProperties(
     refreshTokenExpiration = 86400000
 )
 
-fun stubCreateUserRequestDTO(): CreateUserRequestDTO = CreateUserRequestDTO(
-    username = "username",
-    password = "password"
-)
+fun stubCreateUserRequestDTO(): CreateUserRequestDTO =
+    CreateUserRequestDTO(
+        username = "username", password = "password"
+    )
 
-fun stubPostDTO(id: Int = 1): PostResponseDTO = PostResponseDTO(
-    id = id.toLong(),
-    title = "title $id",
-    content = "content $id",
-    createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
-    likes = 1,
-    user = stubUserDTO()
-)
+fun stubPostDTO(id: Int = 1): PostResponseDTO =
+   PostResponseDTO(
+        id = id.toLong(),
+        title = "title $id",
+        content = "content $id",
+        createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS),
+        likes = 1,
+        user = stubUserDTO()
+    )
 
 fun stubNotification(id: Int = 1): Notification = Notification(
     id = id.toLong(),

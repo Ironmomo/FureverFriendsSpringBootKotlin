@@ -8,7 +8,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import org.example.fureverfriends.dto.post.PostResponseDTO
+import org.example.fureverfriends.api.dto.post.PostResponseDTO
 import org.example.fureverfriends.model.user.User
 import java.time.LocalDateTime
 
@@ -35,5 +35,12 @@ data class Post(
     @JoinColumn(name = "user_id")
     val user: User
 ) {
-    fun mapToDTO() = PostResponseDTO(id, title, content, createdAt, likes, user = user.mapToDTO())
+    fun mapToDTO() = PostResponseDTO(
+        id,
+        title,
+        content,
+        createdAt,
+        likes,
+        user = user.mapToDTO()
+    )
 }
