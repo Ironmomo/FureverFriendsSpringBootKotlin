@@ -1,5 +1,11 @@
 package org.example.fureverfriends.controller.userfollowing
 
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
+import org.example.fureverfriends.dto.error.ErrorResponseDTO
 import org.example.fureverfriends.dto.user.FoundUsersDTO
 import org.example.fureverfriends.dto.userfollowing.UserFollowingRequestDTO
 import org.example.fureverfriends.service.userfollowing.UserFollowingService
@@ -17,6 +23,7 @@ import java.security.Principal
 
 @RestController
 @RequestMapping("/api/relation")
+@Tag(name = "UserFollowing Controller", description = "Operations related to user followings. Authentication is required.")
 class UserFollowingController(
     private val userFollowingService: UserFollowingService
 ) {
@@ -39,6 +46,15 @@ class UserFollowingController(
         return userFollowingService.findFollowings(principal.name, pageIndex)
     }
 
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "409",
+                description = "User does not exist",
+                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
+            )
+        ]
+    )
     @PostMapping("/follow")
     @ResponseStatus(CREATED)
     fun followingRequest(
@@ -48,6 +64,15 @@ class UserFollowingController(
         userFollowingService.followingRequest(followerId = principal.name, followingId = followingRequest.userToFollow)
     }
 
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "409",
+                description = "There is no pending UserRelation",
+                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
+            )
+        ]
+    )
     @PostMapping("/accept")
     @ResponseStatus(CREATED)
     fun acceptingRequest(
@@ -57,6 +82,15 @@ class UserFollowingController(
         userFollowingService.acceptFollowingRequest(followerId = principal.name, followingId = followingRequest.userToFollow)
     }
 
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "409",
+                description = "There is no pending UserRelation",
+                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
+            )
+        ]
+    )
     @PostMapping("/reject")
     @ResponseStatus(OK)
     fun rejectingRequest(
