@@ -2,13 +2,15 @@ package org.example.fureverfriends.processing.service.user
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
+import org.example.fureverfriends.api.dto.actions.ActionDTO
+import org.example.fureverfriends.api.dto.actions.UserAction.FOLLOW
 import org.example.fureverfriends.api.dto.user.CreateUserRequestDTO
 import org.example.fureverfriends.api.dto.user.FoundUsersDTO
 import org.example.fureverfriends.api.dto.user.UserDTO
+import org.example.fureverfriends.api.uriprovider.UserFollowingUriProviderImpl
 import org.example.fureverfriends.model.user.Role.USER
 import org.example.fureverfriends.model.user.User
 import org.example.fureverfriends.processing.processor.NGramSearchProcessor
-import org.example.fureverfriends.processing.service.user.UserServiceImpl
 import org.example.fureverfriends.repository.user.UserRepository
 import org.example.fureverfriends.stubs.stubUser
 import org.junit.jupiter.api.Nested
@@ -25,7 +27,7 @@ class UserServiceImplTest {
     inner class CreateUserTests {
         @Test
         fun `should create user if not existing`() {
-            val userRequest = org.example.fureverfriends.api.dto.user.CreateUserRequestDTO(
+            val userRequest = CreateUserRequestDTO(
                 username = "username", password = "password"
             )
             val encodedUser = User(
@@ -55,7 +57,7 @@ class UserServiceImplTest {
 
         @Test
         fun `should throw IllegalStateException on user existing`() {
-            val userRequest = org.example.fureverfriends.api.dto.user.CreateUserRequestDTO(
+            val userRequest = CreateUserRequestDTO(
                 username = "username", password = "password"
             )
             val userService = createUserService(
@@ -71,7 +73,7 @@ class UserServiceImplTest {
 
         @Test
         fun `should throw IllegalArgumentException on password not valid`() {
-            val userRequest = org.example.fureverfriends.api.dto.user.CreateUserRequestDTO(
+            val userRequest = CreateUserRequestDTO(
                 username = "username", password = "toshort"
             )
             val userService = createUserService(
@@ -93,20 +95,44 @@ class UserServiceImplTest {
             val searchString = "famousGuy"
             val user1 = stubUser(1)
             val user2 = stubUser(2)
+            val requestUri = "https://test.com/action"
             val nGramSearchProcessor: NGramSearchProcessor = mock {
                 on { nGramSearch(searchString) } doReturn setOf(user1, user2)
             }
-            val userService = createUserService(nGramSearchProcessor = nGramSearchProcessor)
+            val userFollowingUriProviderImpl: UserFollowingUriProviderImpl = mock {
+                on { getFollowingRequestUri() } doReturn requestUri
+                on { toExternalUri(requestUri) } doReturn requestUri
+            }
+            val userService = createUserService(
+                nGramSearchProcessor = nGramSearchProcessor,
+                userFollowingUriProviderImpl = userFollowingUriProviderImpl
+            )
 
             val foundUsersDTO = userService.searchForUser(searchString)
 
             assertAll(
                 { verify(nGramSearchProcessor).nGramSearch(searchString) },
                 { assertThat(foundUsersDTO).isEqualTo(
-                    org.example.fureverfriends.api.dto.user.FoundUsersDTO(
+                    FoundUsersDTO(
                         foundUsers = listOf(
-                            org.example.fureverfriends.api.dto.user.UserDTO(user1.username),
-                            org.example.fureverfriends.api.dto.user.UserDTO(user2.username)
+                            UserDTO(
+                                username = user1.username,
+                                actions = listOf(
+                                    ActionDTO(
+                                        uri = requestUri,
+                                        action = FOLLOW
+                                    )
+                                )
+                            ),
+                            UserDTO(
+                                username = user2.username,
+                                actions = listOf(
+                                    ActionDTO(
+                                        uri = requestUri,
+                                        action = FOLLOW
+                                    )
+                                )
+                            )
                         )
                     )
                 ) }
@@ -143,11 +169,13 @@ class UserServiceImplTest {
     private fun createUserService(
         userRepository: UserRepository = mock(),
         encoder: PasswordEncoder = mock(),
-        nGramSearchProcessor: NGramSearchProcessor = mock()
+        nGramSearchProcessor: NGramSearchProcessor = mock(),
+        userFollowingUriProviderImpl: UserFollowingUriProviderImpl = mock()
     ) =
         UserServiceImpl(
             userRepository = userRepository,
             encoder = encoder,
             nGramSearchProcessor = nGramSearchProcessor,
+            userFollowingUriProviderImpl = userFollowingUriProviderImpl,
         )
 }
