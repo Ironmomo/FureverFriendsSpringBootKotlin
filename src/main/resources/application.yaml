@@ -21,3 +21,5 @@ springdoc:
   swagger-ui:
     enabled: true
   packages-to-scan: org.example.fureverfriends
+url:
+  externalUrl: http://localhost:8080
