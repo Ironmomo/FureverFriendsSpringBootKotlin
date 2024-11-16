@@ -1,6 +1,7 @@
 package org.example.fureverfriends.api.controller.post
 
 import org.example.fureverfriends.api.dto.post.LatestPostsDTO
+import org.example.fureverfriends.api.uriprovider.PostUriProviderImpl
 import org.example.fureverfriends.processing.service.post.PostService
 import org.example.fureverfriends.stubs.stubPostDTO
 import org.junit.jupiter.api.Nested
@@ -28,12 +29,14 @@ class PostControllerTest {
     private lateinit var mockMvc: MockMvc
     @MockBean
     private lateinit var postService: PostService
+    @Autowired
+    private lateinit var postUriProvider: PostUriProviderImpl
 
     @Nested
     inner class LikePostTests {
         @Test
         fun `on not authenticated return 403`() {
-            mockMvc.perform(post("/api/post/like").param("postId", "2"))
+            mockMvc.perform(post(postUriProvider.getLikePostUri()).param("postId", "2"))
                 .andExpect(status().isForbidden)
         }
 
@@ -42,7 +45,7 @@ class PostControllerTest {
         fun `should call service`() {
             val postId: Long = 2
 
-            mockMvc.perform(post("/api/post/like").param("postId", postId.toString()))
+            mockMvc.perform(post(postUriProvider.getLikePostUri()).param("postId", postId.toString()))
             .andExpect(status().isAccepted)
             verify(postService).likePost("someUser", postId)
         }
@@ -52,14 +55,14 @@ class PostControllerTest {
         fun `on wrong parameter type should return 406`() {
             val invalidParameter = "invalid"
 
-            mockMvc.perform(post("/api/post/like").param("postId", invalidParameter))
+            mockMvc.perform(post(postUriProvider.getLikePostUri()).param("postId", invalidParameter))
                 .andExpect(status().isNotAcceptable)
         }
 
         @Test
         @WithMockUser(username = "someUser")
         fun `on missing parameter type should return 400`() {
-            mockMvc.perform(post("/api/post/like"))
+            mockMvc.perform(post(postUriProvider.getLikePostUri()))
                 .andExpect(status().isBadRequest)
         }
     }
@@ -68,7 +71,7 @@ class PostControllerTest {
     inner class GetLatestPostTests {
         @Test
         fun `on not authenticated return 403`() {
-            mockMvc.perform(get("/api/post/latest").param("page", "0"))
+            mockMvc.perform(get(postUriProvider.getLatestPostsUri()).param("page", "0"))
                 .andExpect(status().isForbidden)
         }
 
@@ -83,7 +86,7 @@ class PostControllerTest {
 
             whenever(postService.findLatestPosts("someUser", 0)).doReturn(latestPostsDTO)
 
-            mockMvc.perform(get("/api/post/latest").param("page", "0")
+            mockMvc.perform(get(postUriProvider.getLatestPostsUri()).param("page", "0")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk)
                 .andExpect(jsonPath("$.posts[0].id").value(post1.id))

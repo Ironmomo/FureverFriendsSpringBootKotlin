@@ -16,7 +16,6 @@ abstract class UriProvider(
 @Component
 class UserUriProviderImpl(urlProperties: UrlProperties) : UriProvider("/user", urlProperties) {
     fun getCreateUserUri(): String = "$baseUri/create"
-
     fun getSearchUserUri(searchString: String): String = "$baseUri/search/$searchString"
 }
 
@@ -27,4 +26,10 @@ class UserFollowingUriProviderImpl(urlProperties: UrlProperties) : UriProvider("
     fun getFollowingsUri(): String = "$baseUri/followings"
     fun getAcceptingRequestUri(): String = "$baseUri/accept"
     fun getRejectingRequestUri(): String = "$baseUri/reject"
+}
+
+@Component
+class PostUriProviderImpl(urlProperties: UrlProperties) : UriProvider("/post", urlProperties) {
+    fun getLatestPostsUri(): String = "$baseUri/latest"
+    fun getLikePostUri(): String = "$baseUri/like"
 }

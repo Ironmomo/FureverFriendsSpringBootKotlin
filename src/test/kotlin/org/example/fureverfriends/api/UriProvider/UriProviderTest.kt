@@ -1,6 +1,7 @@
 package org.example.fureverfriends.api.UriProvider
 
 import org.assertj.core.api.Assertions.assertThat
+import org.example.fureverfriends.api.uriprovider.PostUriProviderImpl
 import org.example.fureverfriends.api.uriprovider.UserFollowingUriProviderImpl
 import org.example.fureverfriends.api.uriprovider.UserUriProviderImpl
 import org.junit.jupiter.api.Nested
@@ -153,6 +154,63 @@ class UriProviderTest {
             )
 
             val returnedUri = provider.getRejectingRequestUri()
+
+            assertAll(
+                { assertThat(returnedUri).isEqualTo(expectedUri) },
+                { assertThat(provider.toExternalUri(returnedUri)).isEqualTo("$url$expectedUri") }
+            )
+        }
+    }
+
+    @Nested
+    inner class PostUriProviderTests {
+        @Test
+        fun testBaseUri() {
+            val url = "https://test.com"
+            val expectedUri = "/api/v1/post"
+            val provider = PostUriProviderImpl(
+                urlProperties = mock {
+                    on { externalUrl } doReturn url
+                }
+            )
+
+            val returnedUri = provider.baseUri
+
+            assertAll(
+                { assertThat(returnedUri).isEqualTo(expectedUri) },
+                { assertThat(provider.toExternalUri(returnedUri)).isEqualTo("$url$expectedUri") }
+            )
+        }
+
+        @Test
+        fun testLatestPostsUri() {
+            val url = "https://test.com"
+            val expectedUri = "/api/v1/post/latest"
+            val provider = PostUriProviderImpl(
+                urlProperties = mock {
+                    on { externalUrl } doReturn url
+                }
+            )
+
+            val returnedUri = provider.getLatestPostsUri()
+
+            assertAll(
+                { assertThat(returnedUri).isEqualTo(expectedUri) },
+                { assertThat(provider.toExternalUri(returnedUri)).isEqualTo("$url$expectedUri") }
+            )
+        }
+
+        @Test
+        fun testLikePostUri() {
+            val url = "https://test.com"
+            val expectedUri = "/api/v1/post/like"
+            val provider = PostUriProviderImpl(
+                urlProperties = mock {
+                    on { externalUrl } doReturn url
+                }
+            )
+
+            val returnedUri = provider.getLikePostUri()
 
             assertAll(
                 { assertThat(returnedUri).isEqualTo(expectedUri) },

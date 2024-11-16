@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.example.fureverfriends.api.dto.error.ErrorResponseDTO
 import org.example.fureverfriends.api.dto.post.LatestPostsDTO
 import org.example.fureverfriends.processing.service.post.PostService
 import org.springframework.http.HttpStatus
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.security.Principal
 
 @RestController
-@RequestMapping("/api/post")
+@RequestMapping("/api/v1/post")
 @Tag(name = "Post Controller", description = "Operations related to posts. Authentication is required")
 class PostController(
     private val postService: PostService
@@ -41,12 +42,12 @@ class PostController(
             ApiResponse(
                 responseCode = "409",
                 description = "Post not found",
-                content = [Content(schema = Schema(implementation = org.example.fureverfriends.api.dto.error.ErrorResponseDTO::class))]
+                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
             ),
             ApiResponse(
                 responseCode = "401",
                 description = "User is not authorized to like this post because he is not following the author of the post",
-                content = [Content(schema = Schema(implementation = org.example.fureverfriends.api.dto.error.ErrorResponseDTO::class))]
+                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
             )
         ]
     )
