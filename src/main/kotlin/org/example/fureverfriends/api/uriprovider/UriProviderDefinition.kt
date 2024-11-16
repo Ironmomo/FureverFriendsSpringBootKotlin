@@ -19,3 +19,12 @@ class UserUriProviderImpl(urlProperties: UrlProperties) : UriProvider("/user", u
 
     fun getSearchUserUri(searchString: String): String = "$baseUri/search/$searchString"
 }
+
+@Component
+class UserFollowingUriProviderImpl(urlProperties: UrlProperties) : UriProvider("/relation", urlProperties) {
+    fun getFollowingRequestUri() = "$baseUri/follow"
+    fun getFollowersUri(): String = "$baseUri/followers"
+    fun getFollowingsUri(): String = "$baseUri/followings"
+    fun getAcceptingRequestUri(): String = "$baseUri/accept"
+    fun getRejectingRequestUri(): String = "$baseUri/reject"
+}

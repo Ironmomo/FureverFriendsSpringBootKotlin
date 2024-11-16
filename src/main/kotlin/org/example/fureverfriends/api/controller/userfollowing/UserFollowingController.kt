@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.example.fureverfriends.api.dto.error.ErrorResponseDTO
-import org.example.fureverfriends.api.dto.user.FoundUsersDTO
 import org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO
 import org.example.fureverfriends.processing.service.userfollowing.UserFollowingService
 import org.springframework.http.HttpStatus.CREATED
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.security.Principal
 
 @RestController
-@RequestMapping("/api/relation")
+@RequestMapping("/api/v1/relation")
 @Tag(name = "UserFollowing Controller", description = "Operations related to user followings. Authentication is required.")
 class UserFollowingController(
     private val userFollowingService: UserFollowingService
@@ -51,7 +50,7 @@ class UserFollowingController(
             ApiResponse(
                 responseCode = "409",
                 description = "User does not exist",
-                content = [Content(schema = Schema(implementation = org.example.fureverfriends.api.dto.error.ErrorResponseDTO::class))]
+                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
             )
         ]
     )
@@ -59,7 +58,7 @@ class UserFollowingController(
     @ResponseStatus(CREATED)
     fun followingRequest(
         principal: Principal,
-        @RequestBody followingRequest: org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO
+        @RequestBody followingRequest: UserFollowingRequestDTO
     ) {
         userFollowingService.followingRequest(followerId = principal.name, followingId = followingRequest.userToFollow)
     }
@@ -69,7 +68,7 @@ class UserFollowingController(
             ApiResponse(
                 responseCode = "409",
                 description = "There is no pending UserRelation",
-                content = [Content(schema = Schema(implementation = org.example.fureverfriends.api.dto.error.ErrorResponseDTO::class))]
+                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
             )
         ]
     )
@@ -77,7 +76,7 @@ class UserFollowingController(
     @ResponseStatus(CREATED)
     fun acceptingRequest(
         principal: Principal,
-        @RequestBody followingRequest: org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO
+        @RequestBody followingRequest: UserFollowingRequestDTO
     ) {
         userFollowingService.acceptFollowingRequest(followerId = principal.name, followingId = followingRequest.userToFollow)
     }
@@ -87,7 +86,7 @@ class UserFollowingController(
             ApiResponse(
                 responseCode = "409",
                 description = "There is no pending UserRelation",
-                content = [Content(schema = Schema(implementation = org.example.fureverfriends.api.dto.error.ErrorResponseDTO::class))]
+                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
             )
         ]
     )
@@ -95,7 +94,7 @@ class UserFollowingController(
     @ResponseStatus(OK)
     fun rejectingRequest(
         principal: Principal,
-        @RequestBody followingRequest: org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO
+        @RequestBody followingRequest: UserFollowingRequestDTO
     ) {
         userFollowingService.rejectFollowingRequest(followerId = principal.name, followingId = followingRequest.userToFollow)
     }

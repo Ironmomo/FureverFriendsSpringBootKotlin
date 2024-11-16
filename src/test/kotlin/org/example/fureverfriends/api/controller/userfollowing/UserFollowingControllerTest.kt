@@ -1,8 +1,8 @@
 package org.example.fureverfriends.api.controller.userfollowing
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.example.fureverfriends.api.dto.user.FoundUsersDTO
 import org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO
+import org.example.fureverfriends.api.uriprovider.UserFollowingUriProviderImpl
 import org.example.fureverfriends.processing.service.userfollowing.UserFollowingService
 import org.example.fureverfriends.stubs.stubUserDTO
 import org.junit.jupiter.api.Nested
@@ -31,13 +31,15 @@ class UserFollowingControllerTest {
     private lateinit var userFollowingService: UserFollowingService
     @Autowired
     lateinit var objectMapper: ObjectMapper
+    @Autowired
+    lateinit var userFollowingUriProviderImpl: UserFollowingUriProviderImpl
 
     @Nested
     inner class GetFollowerTests {
         @Test
         fun `should return 403 on missing authentication`() {
             mockMvc.perform(
-                get("/api/relation/followers").param("page", "0"))
+                get(userFollowingUriProviderImpl.getFollowersUri()).param("page", "0"))
                 .andExpect(status().isForbidden)
         }
 
@@ -49,7 +51,7 @@ class UserFollowingControllerTest {
             )
 
             whenever(userFollowingService.findFollowers("SomeUser", 0)).doReturn(dto)
-            mockMvc.perform(get("/api/relation/followers").accept(APPLICATION_JSON))
+            mockMvc.perform(get(userFollowingUriProviderImpl.getFollowersUri()).accept(APPLICATION_JSON))
                 .andExpect(status().isFound)
                 .andExpect(jsonPath("$.foundUsers[0].username").value(dto.foundUsers.first().username))
                 .andExpect(jsonPath("$.isLastPage").value(true))
@@ -58,7 +60,7 @@ class UserFollowingControllerTest {
         @Test
         @WithMockUser(username = "SomeUser")
         fun `on invalid parameter`() {
-            mockMvc.perform(get("/api/relation/followers").param("page", "notANumber").accept(APPLICATION_JSON))
+            mockMvc.perform(get(userFollowingUriProviderImpl.getFollowersUri()).param("page", "notANumber").accept(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable)
         }
     }
@@ -68,7 +70,7 @@ class UserFollowingControllerTest {
         @Test
         fun `should return 403 on missing authentication`() {
             mockMvc.perform(
-                get("/api/relation/followings").param("page", "0"))
+                get(userFollowingUriProviderImpl.getFollowingsUri()).param("page", "0"))
                 .andExpect(status().isForbidden)
         }
 
@@ -80,7 +82,7 @@ class UserFollowingControllerTest {
             )
 
             whenever(userFollowingService.findFollowings("SomeUser", 0)).doReturn(dto)
-            mockMvc.perform(get("/api/relation/followings").accept(APPLICATION_JSON))
+            mockMvc.perform(get(userFollowingUriProviderImpl.getFollowingsUri()).accept(APPLICATION_JSON))
                 .andExpect(status().isFound)
                 .andExpect(jsonPath("$.foundUsers[0].username").value(dto.foundUsers.first().username))
                 .andExpect(jsonPath("$.isLastPage").value(true))
@@ -89,7 +91,7 @@ class UserFollowingControllerTest {
         @Test
         @WithMockUser(username = "SomeUser")
         fun `on invalid parameter`() {
-            mockMvc.perform(get("/api/relation/followings").param("page", "notANumber").accept(APPLICATION_JSON))
+            mockMvc.perform(get(userFollowingUriProviderImpl.getFollowingsUri()).param("page", "notANumber").accept(APPLICATION_JSON))
                 .andExpect(status().isNotAcceptable)
         }
     }
@@ -99,11 +101,11 @@ class UserFollowingControllerTest {
         @Test
         @WithMockUser(username = "SomeUser")
         fun `on success`() {
-            val dto = org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO("ToFollow")
+            val dto = UserFollowingRequestDTO("ToFollow")
             val requestBody = objectMapper.writeValueAsString(dto)
 
             mockMvc.perform(
-                post("/api/relation/follow")
+                post(userFollowingUriProviderImpl.getFollowingRequestUri())
                     .contentType(APPLICATION_JSON)
                     .content(requestBody))
                 .andExpect(status().isCreated)
@@ -112,11 +114,11 @@ class UserFollowingControllerTest {
 
         @Test
         fun `should return 403 on missing authentication`() {
-            val dto = org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO("ToFollow")
+            val dto = UserFollowingRequestDTO("ToFollow")
             val requestBody = objectMapper.writeValueAsString(dto)
 
             mockMvc.perform(
-                post("/api/relation/follow")
+                post(userFollowingUriProviderImpl.getFollowingRequestUri())
                     .contentType(APPLICATION_JSON)
                     .content(requestBody))
                 .andExpect(status().isForbidden)
@@ -128,11 +130,11 @@ class UserFollowingControllerTest {
         @Test
         @WithMockUser(username = "SomeUser")
         fun `on success`() {
-            val dto = org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO("ToFollow")
+            val dto = UserFollowingRequestDTO("ToFollow")
             val requestBody = objectMapper.writeValueAsString(dto)
 
             mockMvc.perform(
-                post("/api/relation/accept")
+                post(userFollowingUriProviderImpl.getAcceptingRequestUri())
                     .contentType(APPLICATION_JSON)
                     .content(requestBody))
                 .andExpect(status().isCreated)
@@ -141,11 +143,11 @@ class UserFollowingControllerTest {
 
         @Test
         fun `should return 403 on missing authentication`() {
-            val dto = org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO("ToFollow")
+            val dto = UserFollowingRequestDTO("ToFollow")
             val requestBody = objectMapper.writeValueAsString(dto)
 
             mockMvc.perform(
-                post("/api/relation/accept")
+                post(userFollowingUriProviderImpl.getAcceptingRequestUri())
                     .contentType(APPLICATION_JSON)
                     .content(requestBody))
                 .andExpect(status().isForbidden)
@@ -157,11 +159,11 @@ class UserFollowingControllerTest {
         @Test
         @WithMockUser(username = "SomeUser")
         fun `on success`() {
-            val dto = org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO("ToFollow")
+            val dto = UserFollowingRequestDTO("ToFollow")
             val requestBody = objectMapper.writeValueAsString(dto)
 
             mockMvc.perform(
-                post("/api/relation/reject")
+                post(userFollowingUriProviderImpl.getRejectingRequestUri())
                     .contentType(APPLICATION_JSON)
                     .content(requestBody))
                 .andExpect(status().isOk)
@@ -170,11 +172,11 @@ class UserFollowingControllerTest {
 
         @Test
         fun `should return 403 on missing authentication`() {
-            val dto = org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO("ToFollow")
+            val dto = UserFollowingRequestDTO("ToFollow")
             val requestBody = objectMapper.writeValueAsString(dto)
 
             mockMvc.perform(
-                post("/api/relation/reject")
+                post(userFollowingUriProviderImpl.getRejectingRequestUri())
                     .contentType(APPLICATION_JSON)
                     .content(requestBody))
                 .andExpect(status().isForbidden)
