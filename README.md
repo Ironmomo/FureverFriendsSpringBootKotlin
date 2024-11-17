@@ -10,7 +10,7 @@ This repository contains a **Spring Boot-based Social Media API** designed for a
 - Optimized fetching of entities using **Entity Graphs** and **fetch joins** to prevent excessive database queries and improve performance.
 
 ### 2. **Type-Safe Notification Service**
-- Notifications for events like likes and follow requests are dispatched using a **type-safe notification service**, which supports pooling for efficiency.
+- Notifications for events like likes and follow requests are dispatched using a **type-safe notification service**.
 
 ### 3. **Type-Safe Actions in DTOs**
 - DTOs include a **type-safe `action` property**, listing possible actions for resources with their respective URLs, adhering to RESTful API best practices.
@@ -27,7 +27,6 @@ This repository contains a **Spring Boot-based Social Media API** designed for a
 
 ### 6. **Persistence and Database**
 - Uses **Spring Data JPA** with an **H2 in-memory database** for development and testing.
-- Entities are designed for scalability and normalization.
 
 ### 7. **Exception Handling**
 - Centralized error handling using `@ControllerAdvice` for consistent and global exception management in the API layer.
