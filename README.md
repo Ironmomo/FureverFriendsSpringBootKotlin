@@ -4,7 +4,7 @@ This repository contains a **Spring Boot-based Social Media API** designed for a
 
 ---
 
-## Features
+## Key-Features
 
 ### 1. **Preventing the N+1 Problem**
 - Optimized fetching of entities using **Entity Graphs** and **fetch joins** to prevent excessive database queries and improve performance.
@@ -19,7 +19,7 @@ This repository contains a **Spring Boot-based Social Media API** designed for a
 - **Swagger UI** is integrated for user-friendly API exploration and testing.
 
 ### 5. **Secure Authentication and Authorization**
-- JWT-based security implementation with:
+- JWT-based security using Spring Security and custom implemented:
   - `JwtAuthenticationFilter` (extends `OncePerRequestFilter`)
   - `JwtAuthentication` (implements `Authentication`)
   - `JwtAuthenticationProvider` (implements `AuthenticationProvider`)
@@ -40,7 +40,7 @@ This repository contains a **Spring Boot-based Social Media API** designed for a
 ## Installation
 
 ### Prerequisites
-1. **Kotlin 1.9.25+**
+1. **Java 17+**
 2. **Gradle 8.10+**
 
 ### Steps
@@ -51,11 +51,11 @@ This repository contains a **Spring Boot-based Social Media API** designed for a
    ```
 2. Build Project
    ```bash
-   gradle clean build
+   ./gradlew clean build
    ```
 3. Run the applicaion
       ```bash
-   gradle bootRun
+   ./gradlew bootRun
    ```
 4. Access the API documentation
 - Swagger UI: http://localhost:8080/swagger-ui/index.html#/
