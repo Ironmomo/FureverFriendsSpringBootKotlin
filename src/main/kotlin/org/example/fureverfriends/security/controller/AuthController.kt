@@ -24,7 +24,10 @@ class AuthController(
             ApiResponse(
                 responseCode = "403",
                 description = "Ungültige Anmeldedaten",
-                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDTO::class))
+                ]
             )
         ]
     )

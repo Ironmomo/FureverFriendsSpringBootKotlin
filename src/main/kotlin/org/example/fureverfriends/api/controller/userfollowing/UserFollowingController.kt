@@ -6,11 +6,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.example.fureverfriends.api.dto.error.ErrorResponseDTO
+import org.example.fureverfriends.api.dto.user.FoundUsersDTO
 import org.example.fureverfriends.api.dto.userfollowing.UserFollowingRequestDTO
 import org.example.fureverfriends.processing.service.userfollowing.UserFollowingService
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.FOUND
 import org.springframework.http.HttpStatus.OK
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -27,21 +29,21 @@ class UserFollowingController(
     private val userFollowingService: UserFollowingService
 ) {
 
-    @GetMapping("/followers")
+    @GetMapping("/followers", produces = [APPLICATION_JSON_VALUE])
     @ResponseStatus(FOUND)
     fun getFollowers(
         principal: Principal,
         @RequestParam(value = "page", defaultValue = "0") pageIndex: Int
-    ): org.example.fureverfriends.api.dto.user.FoundUsersDTO {
+    ): FoundUsersDTO {
         return userFollowingService.findFollowers(principal.name, pageIndex)
     }
 
-    @GetMapping("/followings")
+    @GetMapping("/followings", produces = [APPLICATION_JSON_VALUE])
     @ResponseStatus(FOUND)
     fun getFollowings(
         principal: Principal,
         @RequestParam(value = "page", defaultValue = "0") pageIndex: Int
-    ): org.example.fureverfriends.api.dto.user.FoundUsersDTO {
+    ): FoundUsersDTO {
         return userFollowingService.findFollowings(principal.name, pageIndex)
     }
 
@@ -50,7 +52,10 @@ class UserFollowingController(
             ApiResponse(
                 responseCode = "409",
                 description = "User does not exist",
-                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDTO::class))
+                ]
             )
         ]
     )
@@ -68,7 +73,10 @@ class UserFollowingController(
             ApiResponse(
                 responseCode = "409",
                 description = "There is no pending UserRelation",
-                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDTO::class))
+                ]
             )
         ]
     )
@@ -86,7 +94,10 @@ class UserFollowingController(
             ApiResponse(
                 responseCode = "409",
                 description = "There is no pending UserRelation",
-                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDTO::class))
+                ]
             )
         ]
     )

@@ -42,12 +42,18 @@ class PostController(
             ApiResponse(
                 responseCode = "409",
                 description = "Post not found",
-                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDTO::class))
+                ]
             ),
             ApiResponse(
                 responseCode = "401",
                 description = "User is not authorized to like this post because he is not following the author of the post",
-                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDTO::class))
+                ]
             )
         ]
     )

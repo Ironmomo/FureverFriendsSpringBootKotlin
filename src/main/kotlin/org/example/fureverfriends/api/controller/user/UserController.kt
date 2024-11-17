@@ -11,6 +11,7 @@ import org.example.fureverfriends.api.dto.user.FoundUsersDTO
 import org.example.fureverfriends.processing.service.user.UserService
 import org.springframework.http.HttpStatus.CREATED
 import org.springframework.http.HttpStatus.FOUND
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -31,12 +32,18 @@ class UserController(
             ApiResponse(
                 responseCode = "409",
                 description = "User already exists",
-                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDTO::class))
+                ]
             ),
             ApiResponse(
                 responseCode = "406",
                 description = "Password requirements not met",
-                content = [Content(schema = Schema(implementation = ErrorResponseDTO::class))]
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDTO::class))
+                ]
             )
         ]
     )
@@ -46,7 +53,7 @@ class UserController(
         userService.createUser(userRequest)
     }
 
-    @GetMapping("/search/{searchString}")
+    @GetMapping("/search/{searchString}", produces = [APPLICATION_JSON_VALUE])
     @ResponseStatus(FOUND)
     fun searchUsers(@PathVariable searchString: String): FoundUsersDTO = userService.searchForUser(searchString)
 }
